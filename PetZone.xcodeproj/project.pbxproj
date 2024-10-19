@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		F00E0F032CC36E970080D38C /* ParseSwift in Frameworks */ = {isa = PBXBuildFile; productRef = F00E0F022CC36E970080D38C /* ParseSwift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		F0DB15C42CC0B1CD0080AD82 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -65,6 +69,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F00E0F032CC36E970080D38C /* ParseSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -125,6 +130,7 @@
 			);
 			name = PetZone;
 			packageProductDependencies = (
+				F00E0F022CC36E970080D38C /* ParseSwift */,
 			);
 			productName = PetZone;
 			productReference = F0DB15AA2CC0B1CB0080AD82 /* PetZone.app */;
@@ -208,6 +214,9 @@
 			);
 			mainGroup = F0DB15A12CC0B1CB0080AD82;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				F00E0F012CC36CE20080D38C /* XCRemoteSwiftPackageReference "Parse-Swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = F0DB15AB2CC0B1CB0080AD82 /* Products */;
 			projectDirPath = "";
@@ -563,6 +572,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		F00E0F012CC36CE20080D38C /* XCRemoteSwiftPackageReference "Parse-Swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/parse-community/Parse-Swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.14.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		F00E0F022CC36E970080D38C /* ParseSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F00E0F012CC36CE20080D38C /* XCRemoteSwiftPackageReference "Parse-Swift" */;
+			productName = ParseSwift;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = F0DB15A22CC0B1CB0080AD82 /* Project object */;
 }
