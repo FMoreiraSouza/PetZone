@@ -45,25 +45,24 @@ class SideMenuViewController: UIViewController {
     @objc func navigateToAbout() {
         let aboutVC = AboutViewController()
         navigationController?.pushViewController(aboutVC, animated: true)
-        closeSideMenu() // Fecha o menu lateral
+        closeSideMenu()
     }
 
     @objc func navigateToOrders() {
         let ordersVC = OrdersViewController()
         navigationController?.pushViewController(ordersVC, animated: true)
-        closeSideMenu() // Fecha o menu lateral
+        closeSideMenu()
     }
 
     @objc func logout() {
         let loginVC = LoginViewController()
         navigationController?.setViewControllers([loginVC], animated: true)
-        closeSideMenu() // Fecha o menu lateral
+        closeSideMenu()
     }
 
-    // Método para fechar o menu lateral
     private func closeSideMenu() {
         if let homeVC = homeViewController {
-            homeVC.toggleSideMenu() // Chama a função de fechar o menu na HomeViewController
+            homeVC.toggleSideMenu()
         }
     }
 }

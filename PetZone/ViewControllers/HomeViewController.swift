@@ -1,42 +1,91 @@
 import UIKit
 
-class HomeViewController: UIViewController {
-    
+class HomeViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+
     let sideMenuWidth: CGFloat = 250
     var sideMenu: SideMenuViewController!
     var isSideMenuOpen = false
-    let titleLabel = UILabel() // Adicionando o UILabel para o título
+    let titleLabel = UILabel()
     
+    // Tabela para exibir os produtos
+    let tableView = UITableView()
+    var products: [Product] = []
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(red: 1, green: 0.98, blue: 0.98, alpha: 1)
-        
+
         setupSideMenu()
         setupNavigationBar()
-        setupTitleLabel() // Configurando o título
-        setupTapGesture() // Adicionando gesto de toque
+        setupTitleLabel()
+        setupTapGesture()
+        setupTableView() // Configure a tabela
+        fetchProducts() // Busque os produtos
     }
-    
+
+    func setupTableView() {
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.register(ProductTableCell.self, forCellReuseIdentifier: ProductTableCell.identifier)
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        
+        view.addSubview(tableView)
+
+        // Configura as constraints da tabela
+        NSLayoutConstraint.activate([
+            tableView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 16),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+    }
+
+    func fetchProducts() {
+        let productService = ProductService()
+        productService.fetchProducts { [weak self] result in
+            switch result {
+            case .success(let products):
+                self?.products = products
+                self?.tableView.reloadData()
+            case .failure(let error):
+                print("Erro ao buscar produtos: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    // MARK: - UITableViewDataSource
+
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return products.count
+    }
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: ProductTableCell.identifier, for: indexPath) as! ProductTableCell
+        let product = products[indexPath.row]
+        cell.configure(with: product) // Configura a célula com o produto
+        return cell
+    }
+
+    // MARK: - Remaining methods unchanged
+
     func setupNavigationBar() {
-        // Criando o botão de menu personalizado
         let menuButton = UIButton(type: .system)
         menuButton.setImage(UIImage(systemName: "line.horizontal.3"), for: .normal)
-        menuButton.tintColor = .white // Cor do ícone
-        menuButton.backgroundColor = UIColor(red: 135/255, green: 206/255, blue: 250/255, alpha: 1) // Azul céu
-        menuButton.layer.cornerRadius = 25 // Para circular
-        menuButton.frame = CGRect(x: 0, y: 0, width: 50, height: 50) // Tamanho do botão
+        menuButton.tintColor = .white
+        menuButton.backgroundColor = UIColor(red: 135 / 255, green: 206 / 255, blue: 250 / 255, alpha: 1)
+        menuButton.layer.cornerRadius = 25
+        menuButton.frame = CGRect(x: 0, y: 0, width: 50, height: 50)
         menuButton.addTarget(self, action: #selector(toggleSideMenu), for: .touchUpInside)
-        
-        // Criando um UIBarButtonItem a partir do botão personalizado
+
         let barButtonItem = UIBarButtonItem(customView: menuButton)
         self.navigationItem.leftBarButtonItem = barButtonItem
     }
-    
+
     func setupSideMenu() {
         sideMenu = SideMenuViewController()
-        sideMenu.homeViewController = self // Passando referência
+        sideMenu.homeViewController = self
         sideMenu.view.frame = CGRect(x: -sideMenuWidth, y: 0, width: sideMenuWidth, height: view.frame.height)
-        // Adicionando o sideMenu à janela principal
+
         if let window = UIApplication.shared.windows.first {
             window.addSubview(sideMenu.view)
             sideMenu.view.layer.shadowColor = UIColor.black.cgColor
@@ -47,38 +96,36 @@ class HomeViewController: UIViewController {
         addChild(sideMenu)
         sideMenu.didMove(toParent: self)
     }
-    
+
     func setupTitleLabel() {
         titleLabel.text = "PetZone"
-        titleLabel.font = UIFont.systemFont(ofSize: 48, weight: .bold) // Estilizando o título
-        titleLabel.textColor = UIColor.black // Cor do texto
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false // Usando Auto Layout
+        titleLabel.font = UIFont.systemFont(ofSize: 48, weight: .bold)
+        titleLabel.textColor = UIColor.black
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
 
-        // Adicionando o titleLabel à view
         view.addSubview(titleLabel)
-        
-        // Ajustando as restrições para o titleLabel
+
         NSLayoutConstraint.activate([
-            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8), // Usando safeAreaLayoutGuide
-            titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16)
+            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
+            titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
         ])
     }
-    
+
     func setupTapGesture() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissSideMenu))
         view.addGestureRecognizer(tapGesture)
     }
-    
+
     @objc func toggleSideMenu() {
         isSideMenuOpen.toggle()
-        
+
         let targetPosition = isSideMenuOpen ? 0 : -sideMenuWidth
-        
+
         UIView.animate(withDuration: 0.3) {
             self.sideMenu.view.frame.origin.x = CGFloat(targetPosition)
         }
     }
-    
+
     @objc func dismissSideMenu() {
         if isSideMenuOpen {
             toggleSideMenu()

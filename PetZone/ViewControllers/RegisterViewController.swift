@@ -31,6 +31,8 @@ class RegisterViewController: UIViewController {
             UIColor(red: 0.53, green: 0.81, blue: 0.92, alpha: 1.0).cgColor
         nameTextField.layer.cornerRadius = 8.0
         nameTextField.translatesAutoresizingMaskIntoConstraints = false
+        nameTextField.autocapitalizationType = .none
+
         view.addSubview(nameTextField)
 
         // E-mail
@@ -41,6 +43,8 @@ class RegisterViewController: UIViewController {
             UIColor(red: 0.53, green: 0.81, blue: 0.92, alpha: 1.0).cgColor
         emailTextField.layer.cornerRadius = 8.0
         emailTextField.translatesAutoresizingMaskIntoConstraints = false
+        emailTextField.autocapitalizationType = .none
+
         view.addSubview(emailTextField)
 
         // Senha
@@ -52,6 +56,8 @@ class RegisterViewController: UIViewController {
             UIColor(red: 0.53, green: 0.81, blue: 0.92, alpha: 1.0).cgColor
         passwordTextField.layer.cornerRadius = 8.0
         passwordTextField.translatesAutoresizingMaskIntoConstraints = false
+        passwordTextField.autocapitalizationType = .none
+
         view.addSubview(passwordTextField)
 
         // Confirmação de Senha
@@ -64,6 +70,8 @@ class RegisterViewController: UIViewController {
         confirmPasswordTextField.layer.cornerRadius = 8.0
         confirmPasswordTextField.translatesAutoresizingMaskIntoConstraints =
             false
+        confirmPasswordTextField.autocapitalizationType = .none
+
         view.addSubview(confirmPasswordTextField)
 
         // Botão de Registro
@@ -128,11 +136,14 @@ class RegisterViewController: UIViewController {
             print("Por favor, preencha todos os campos corretamente.")
             return
         }
+        
+        
 
         AuthService.shared.registerUser(name: name, email: email, password: password) { success, error in
             if success {
                 print("Registro bem-sucedido!")
-                // Navegar para outra tela ou atualizar a UI
+                let loginVC = LoginViewController()
+                self.navigationController?.setViewControllers([loginVC], animated: true)
             } else if let error = error {
                 print("Erro ao registrar: \(error.localizedDescription)")
             }
