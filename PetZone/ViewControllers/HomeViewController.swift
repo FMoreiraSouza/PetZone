@@ -65,8 +65,45 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         cell.configure(with: product) // Configura a célula com o produto
         return cell
     }
+    
+    // MARK: - UITableViewDelegate
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let product = products[indexPath.row]
+        
+        // Cria e exibe o diálogo com as informações do produto
+        showProductDetails(product: product)
+        
+        // Desseleciona a célula após o clique
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
+    // Função para exibir o UIAlertController com detalhes do produto
+    func showProductDetails(product: Product) {
+        // Formatar a data de validade
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .medium
+        dateFormatter.timeStyle = .none
+        let expirationDate = product.expirationDate != nil ? dateFormatter.string(from: product.expirationDate!) : "Sem expiração"
+        
+        let alertController = UIAlertController(
+            title: product.name ?? "Detalhes do Produto",
+            message: """
+                    Código: \(product.code ?? "N/A")
+                    Descrição: \(product.description ?? "N/A")
+                    Quantidade: \(product.quantity ?? 0)
+                    Categoria: \(product.category ?? "N/A")
+                    Validade: \(expirationDate)
+                    """,
+            preferredStyle: .alert
+        )
+        
+        let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+        alertController.addAction(okAction)
+        
+        present(alertController, animated: true, completion: nil)
+    }
 
-    // MARK: - Remaining methods unchanged
+    // MARK: - Configurações adicionais
 
     func setupNavigationBar() {
         let menuButton = UIButton(type: .system)
@@ -98,18 +135,50 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
 
     func setupTitleLabel() {
+        // Criar o rótulo para o título
         titleLabel.text = "PetZone"
         titleLabel.font = UIFont.systemFont(ofSize: 48, weight: .bold)
         titleLabel.textColor = UIColor.black
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
 
-        view.addSubview(titleLabel)
+        // Criar o ícone de carro de compras
+        let cartIcon = UIImageView()
+        cartIcon.image = UIImage(systemName: "cart.fill") // Use um ícone de carrinho de compras
+        cartIcon.tintColor = UIColor(red: 135 / 255, green: 206 / 255, blue: 250 / 255, alpha: 1)
+        cartIcon.translatesAutoresizingMaskIntoConstraints = false
+        cartIcon.contentMode = .scaleAspectFit
+        cartIcon.widthAnchor.constraint(equalToConstant: 40).isActive = true // Largura do ícone
+        cartIcon.heightAnchor.constraint(equalToConstant: 40).isActive = true // Altura do ícone
 
+        // Adicionar gesto de toque ao cartIcon
+        let cartTapGesture = UITapGestureRecognizer(target: self, action: #selector(cartIconTapped))
+        cartIcon.isUserInteractionEnabled = true
+        cartIcon.addGestureRecognizer(cartTapGesture)
+
+        // Criar um stack view para organizar o rótulo e o ícone
+        let titleStackView = UIStackView(arrangedSubviews: [titleLabel, cartIcon])
+        titleStackView.axis = .horizontal
+        titleStackView.spacing = 8 // Espaçamento entre o título e o ícone
+        titleStackView.translatesAutoresizingMaskIntoConstraints = false
+
+        view.addSubview(titleStackView)
+
+        // Ajuste as restrições para o stack view
         NSLayoutConstraint.activate([
-            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
-            titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            titleStackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
+            titleStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            titleStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16), // Corrigido para usar view.trailingAnchor
         ])
     }
+
+    // Função chamada quando o cartIcon é clicado
+    @objc func cartIconTapped() {
+        let cartVC = CartViewController()
+        navigationController?.pushViewController(cartVC, animated: true) // Transição para CartViewController
+    }
+
+
+
 
     func setupTapGesture() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissSideMenu))
