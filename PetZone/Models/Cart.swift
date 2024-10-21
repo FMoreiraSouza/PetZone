@@ -7,12 +7,12 @@ struct Cart: ParseObject, Codable, Equatable {
     init() {}
 
     var ACL: ParseSwift.ParseACL?
-
     var objectId: String?
     var name: String?
     var quantity: Int?
     var price: Double?
     var productId: Pointer<Product>?  // Altera o tipo para Pointer<Product>
+    var iamgem: String? // Adicionando a propriedade iamgem
     var createdAt: Date?
     var updatedAt: Date?
 
@@ -23,6 +23,7 @@ struct Cart: ParseObject, Codable, Equatable {
         quantity = try container.decodeIfPresent(Int.self, forKey: .quantity)
         price = try container.decodeIfPresent(Double.self, forKey: .price)
         productId = try container.decodeIfPresent(Pointer<Product>.self, forKey: .productId) // Decodifique como Pointer<Product>
+        iamgem = try container.decodeIfPresent(String.self, forKey: .iamgem) // Decodifique iamgem como String
         createdAt = try container.decodeIfPresent(Date.self, forKey: .createdAt)
         updatedAt = try container.decodeIfPresent(Date.self, forKey: .updatedAt)
     }
@@ -34,6 +35,7 @@ struct Cart: ParseObject, Codable, Equatable {
         try container.encodeIfPresent(quantity, forKey: .quantity)
         try container.encodeIfPresent(price, forKey: .price)
         try container.encodeIfPresent(productId, forKey: .productId) // Codifique como Pointer<Product>
+        try container.encodeIfPresent(iamgem, forKey: .iamgem) // Codifique iamgem como String
         try container.encodeIfPresent(createdAt, forKey: .createdAt)
         try container.encodeIfPresent(updatedAt, forKey: .updatedAt)
     }
@@ -44,6 +46,7 @@ struct Cart: ParseObject, Codable, Equatable {
         case quantity
         case price
         case productId // Altere o tipo para Pointer<Product>
+        case iamgem // Adicione a chave iamgem
         case createdAt
         case updatedAt
     }

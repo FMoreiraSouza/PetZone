@@ -92,6 +92,10 @@ class ProductTableCell: UITableViewCell {
         self.product = product  // Armazena o produto na célula
         productNameLabel.text = product.name
         productPriceLabel.text = product.price != nil ? "$\(product.price!)" : "Preço não disponível"
-        productImageView.loadImage(from: product.image?.url)
+        
+        // Converte o URL para String antes de passar para o método loadImage
+        let imageUrlString = product.image?.url?.absoluteString
+        productImageView.loadImage(from: imageUrlString)
     }
+
 }

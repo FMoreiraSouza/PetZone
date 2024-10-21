@@ -4,6 +4,7 @@ import UIKit
 
 class CartViewController: UIViewController, UITableViewDataSource {
 
+    var products:[Product] = []
     var cartProducts: [Cart] = []  // Lista de itens do carrinho
     private let tableView = UITableView()
     private let cartService = CartService() // Instância do serviço de carrinho
@@ -141,6 +142,7 @@ class CartViewController: UIViewController, UITableViewDataSource {
     @objc private func goToPayment() {
         let paymentVC = PaymentViewController()
         paymentVC.totalAmount = calculateTotal()  // Passa o total para a tela de pagamento
+        paymentVC.products = products  // Passa os produtos do carrinho
         paymentVC.cartProducts = cartProducts  // Passa os produtos do carrinho
         navigationController?.pushViewController(paymentVC, animated: true)
     }

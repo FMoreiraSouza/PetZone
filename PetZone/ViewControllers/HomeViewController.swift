@@ -334,7 +334,7 @@ class HomeViewController: UIViewController, UITableViewDelegate,
 
         // Aqui você pode passar dados para o CartViewController, se necessário
         // Exemplo: cartViewController.cartItems = cart
-
+        cartViewController.products = products
         // Transição para CartViewController
         navigationController?.pushViewController(cartViewController, animated: true)
     }

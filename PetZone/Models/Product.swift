@@ -15,7 +15,7 @@ struct Product: ParseObject, Codable, Equatable {
     var description: String?
     var price: Double?
     var quantity: Int?
-    var image: Image?
+    var image: ParseFile?
     var expirationDate: Date?
     var createdAt: Date?
     var updatedAt: Date?
@@ -56,7 +56,7 @@ struct Product: ParseObject, Codable, Equatable {
         description = try container.decodeIfPresent(String.self, forKey: .description)
         price = try container.decodeIfPresent(Double.self, forKey: .price)
         quantity = try container.decodeIfPresent(Int.self, forKey: .quantity)
-        image = try container.decodeIfPresent(Image.self, forKey: .image)
+        image = try container.decodeIfPresent(ParseFile.self, forKey: .image)
         expirationDate = try container.decodeIfPresent(Date.self, forKey: .expirationDate)
         createdAt = try container.decodeIfPresent(Date.self, forKey: .createdAt)
         updatedAt = try container.decodeIfPresent(Date.self, forKey: .updatedAt)
