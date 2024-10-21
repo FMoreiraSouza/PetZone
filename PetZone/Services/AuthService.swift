@@ -11,7 +11,7 @@ class AuthService {
         name: String, email: String, password: String,
         completion: @escaping (Bool, Error?) -> Void
     ) {
-        if let currentUser = User.current {
+        if User.current != nil {
             User.logout { result in
                 switch result {
                 case .success:

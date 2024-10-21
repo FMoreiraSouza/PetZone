@@ -1,15 +1,22 @@
 import UIKit
 
+protocol ProductTableCellDelegate: AnyObject {
+    func didTapPlusButton(with product: Product)
+}
+
 class ProductTableCell: UITableViewCell {
 
     static let identifier = "ProductTableCell"
-
+    
     let productNameLabel = UILabel()
     let productPriceLabel = UILabel()
     let productImageView = UIImageView()
-    let minusButton = UIButton()
     let plusButton = UIButton()
     let divider = UIView()
+    
+    weak var delegate: ProductTableCellDelegate?  // Delegate para comunicação
+    
+    var product: Product?  // Armazena o produto
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -21,7 +28,7 @@ class ProductTableCell: UITableViewCell {
     }
 
     private func setupViews() {
-        divider.backgroundColor = .gray  // Defina a cor do divisor
+        divider.backgroundColor = .gray
         divider.translatesAutoresizingMaskIntoConstraints = false
 
         productImageView.contentMode = .scaleAspectFill
@@ -29,7 +36,7 @@ class ProductTableCell: UITableViewCell {
         productImageView.translatesAutoresizingMaskIntoConstraints = false
 
         productNameLabel.font = UIFont.systemFont(ofSize: 18, weight: .bold)
-        productNameLabel.numberOfLines = 0  // Permitir múltiplas linhas
+        productNameLabel.numberOfLines = 0
         productNameLabel.translatesAutoresizingMaskIntoConstraints = false
 
         productPriceLabel.font = UIFont.systemFont(ofSize: 16, weight: .regular)
@@ -41,70 +48,50 @@ class ProductTableCell: UITableViewCell {
         plusButton.backgroundColor = .systemGreen
         plusButton.layer.cornerRadius = 15
         plusButton.translatesAutoresizingMaskIntoConstraints = false
-
-        minusButton.setTitle("-", for: .normal)
-        minusButton.setTitleColor(.white, for: .normal)
-        minusButton.backgroundColor = .red
-        minusButton.layer.cornerRadius = 15
-        minusButton.translatesAutoresizingMaskIntoConstraints = false
+        plusButton.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside) // Adiciona ação ao botão
 
         contentView.addSubview(productImageView)
         contentView.addSubview(productNameLabel)
         contentView.addSubview(productPriceLabel)
         contentView.addSubview(plusButton)
-        contentView.addSubview(minusButton)
         contentView.addSubview(divider)
 
         NSLayoutConstraint.activate([
-            productImageView.leadingAnchor.constraint(
-                equalTo: contentView.leadingAnchor, constant: 16),
-            productImageView.centerYAnchor.constraint(
-                equalTo: contentView.centerYAnchor),
+            productImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            productImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             productImageView.widthAnchor.constraint(equalToConstant: 80),
             productImageView.heightAnchor.constraint(equalToConstant: 80),
 
-            productNameLabel.leadingAnchor.constraint(
-                equalTo: productImageView.trailingAnchor, constant: 16),
-            productNameLabel.trailingAnchor.constraint(
-                equalTo: contentView.trailingAnchor, constant: -16),
-            productNameLabel.topAnchor.constraint(
-                equalTo: contentView.topAnchor, constant: 32),  // Aumentado para 32
+            productNameLabel.leadingAnchor.constraint(equalTo: productImageView.trailingAnchor, constant: 16),
+            productNameLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            productNameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 32),
 
-            productPriceLabel.leadingAnchor.constraint(
-                equalTo: productImageView.trailingAnchor, constant: 16),
-            productPriceLabel.trailingAnchor.constraint(
-                equalTo: contentView.trailingAnchor, constant: -16),
-            productPriceLabel.topAnchor.constraint(
-                equalTo: productNameLabel.bottomAnchor, constant: 8),  // Aumentado para 8
-            productPriceLabel.bottomAnchor.constraint(
-                equalTo: contentView.bottomAnchor, constant: -32),  // Aumentado para 32
+            productPriceLabel.leadingAnchor.constraint(equalTo: productImageView.trailingAnchor, constant: 16),
+            productPriceLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            productPriceLabel.topAnchor.constraint(equalTo: productNameLabel.bottomAnchor, constant: 8),
+            productPriceLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -32),
 
-            minusButton.trailingAnchor.constraint(
-                equalTo: contentView.trailingAnchor, constant: -16),
-            minusButton.centerYAnchor.constraint(
-                equalTo: contentView.centerYAnchor, constant: -30),
-            minusButton.widthAnchor.constraint(equalToConstant: 30),
-            minusButton.heightAnchor.constraint(equalToConstant: 30),
-
-            plusButton.trailingAnchor.constraint(
-                equalTo: contentView.trailingAnchor, constant: -16),
-            plusButton.centerYAnchor.constraint(
-                equalTo: contentView.centerYAnchor, constant: 30),
+            plusButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            plusButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             plusButton.widthAnchor.constraint(equalToConstant: 30),
             plusButton.heightAnchor.constraint(equalToConstant: 30),
 
             divider.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
-            divider.trailingAnchor.constraint(equalTo: trailingAnchor,constant: -16),
+            divider.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
             divider.heightAnchor.constraint(equalToConstant: 1),
             divider.centerYAnchor.constraint(equalTo: bottomAnchor),
-
         ])
     }
 
+    @objc private func plusButtonTapped() {
+        guard let product = product else { return }
+        delegate?.didTapPlusButton(with: product)  // Notifica o delegate
+    }
+
     func configure(with product: Product) {
+        self.product = product  // Armazena o produto na célula
         productNameLabel.text = product.name
-        productPriceLabel.text =
-            product.price != nil ? "$\(product.price!)" : "Preço não disponível"
-        productImageView.loadImage(from: product.image?.url)  // Carrega a imagem
+        productPriceLabel.text = product.price != nil ? "$\(product.price!)" : "Preço não disponível"
+        productImageView.loadImage(from: product.image?.url)
     }
 }
