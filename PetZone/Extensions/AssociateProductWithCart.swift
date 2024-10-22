@@ -7,8 +7,8 @@ extension Cart {
         self.name = product.name
         self.quantity = quantity
         self.price = product.price
-        self.createdAt = Date()  // ou outra data relevante
-        self.updatedAt = Date()  // ou outra data relevante
+        self.createdAt = Date()
+        self.updatedAt = Date()
     }
 }
 

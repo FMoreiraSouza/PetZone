@@ -1,13 +1,11 @@
 import UIKit
 
-// MARK: - CartViewController
-
 class CartViewController: UIViewController, UITableViewDataSource {
 
-    var products:[Product] = []
-    var cartProducts: [Cart] = []  // Lista de itens do carrinho
+    var products: [Product] = []
+    var cartProducts: [Cart] = []
     private let tableView = UITableView()
-    private let cartService = CartService() // Instância do serviço de carrinho
+    private let cartService = CartService()
 
     private let totalLabel: UILabel = {
         let label = UILabel()
@@ -31,7 +29,7 @@ class CartViewController: UIViewController, UITableViewDataSource {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         setupTableView()
-        fetchCartItems() // Busca os itens do carrinho ao carregar a view
+        fetchCartItems()
     }
 
     private func setupTableView() {
@@ -43,13 +41,13 @@ class CartViewController: UIViewController, UITableViewDataSource {
 
         view.addSubview(tableView)
         view.addSubview(totalLabel)
-        view.addSubview(paymentButton)  // Adiciona o botão de pagamento à view
+        view.addSubview(paymentButton)
 
         NSLayoutConstraint.activate([
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.topAnchor.constraint(equalTo: view.topAnchor),
-            tableView.bottomAnchor.constraint(equalTo: totalLabel.topAnchor),  // Coloca a tabela acima do totalLabel
+            tableView.bottomAnchor.constraint(equalTo: totalLabel.topAnchor),
 
             totalLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             totalLabel.bottomAnchor.constraint(equalTo: paymentButton.topAnchor, constant: -10),
@@ -62,25 +60,21 @@ class CartViewController: UIViewController, UITableViewDataSource {
         ])
     }
 
-    // MARK: - Função para buscar os itens do carrinho
     private func fetchCartItems() {
         cartService.fetchCartItems { [weak self] result in
             switch result {
             case .success(let cartItems):
-                self?.cartProducts = cartItems // Atualiza a lista de produtos no carrinho
-                self?.tableView.reloadData() // Recarrega a tabela para exibir os itens
-                self?.updateTotalLabel() // Atualiza o total após buscar os itens
+                self?.cartProducts = cartItems
+                self?.tableView.reloadData()
+                self?.updateTotalLabel()
             case .failure(let error):
                 print("Erro ao buscar itens do carrinho: \(error.localizedDescription)")
-                // Aqui você pode mostrar um alerta ou mensagem de erro na interface se desejar
             }
         }
     }
 
-    // MARK: - UITableViewDataSource
-
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return cartProducts.isEmpty ? 1 : cartProducts.count  // Retorna 1 se vazio para mostrar mensagem
+        return cartProducts.isEmpty ? 1 : cartProducts.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -89,9 +83,8 @@ class CartViewController: UIViewController, UITableViewDataSource {
         if cartProducts.isEmpty {
             cell.configure(with: "Nenhum produto adicionado.")
         } else {
-            var product = cartProducts[indexPath.row]
+            let product = cartProducts[indexPath.row]
 
-            // Desembrulha o preço de forma segura
             let priceText: String
             if let price = product.price {
                 priceText = String(format: "$%.2f", price)
@@ -99,29 +92,13 @@ class CartViewController: UIViewController, UITableViewDataSource {
                 priceText = "Preço não disponível"
             }
 
-            // Desembrulha a quantidade de forma segura
             let detailsText = "Produto: \(product.name ?? "Produto desconhecido")\nPreço: \(priceText)\nQuantidade: \(product.quantity ?? 0)"
             cell.configure(with: detailsText)
-
-            // Configura as ações dos botões de quantidade
-            cell.onQuantityChange = { [weak self] change in
-                guard let self = self else { return }
-                let newQuantity = (product.quantity ?? 0) + change
-                if newQuantity >= 0 {
-                    product.quantity = newQuantity
-                    self.cartProducts[indexPath.row] = product  // Atualiza o array
-                    tableView.reloadRows(at: [indexPath], with: .none)  // Atualiza a célula
-
-                    // Recalcula e atualiza o total sempre que a quantidade mudar
-                    self.updateTotalLabel()
-                }
-            }
         }
 
         return cell
     }
 
-    // MARK: - Função para calcular o total do carrinho
     private func calculateTotal() -> Double {
         var total: Double = 0.0
         for product in cartProducts {
@@ -132,18 +109,16 @@ class CartViewController: UIViewController, UITableViewDataSource {
         return total
     }
 
-    // Atualiza o valor total no label
     private func updateTotalLabel() {
         let total = calculateTotal()
         totalLabel.text = String(format: "Total: $%.2f", total)
     }
 
-    // MARK: - Função para navegar para a tela de pagamento
     @objc private func goToPayment() {
         let paymentVC = PaymentViewController()
-        paymentVC.totalAmount = calculateTotal()  // Passa o total para a tela de pagamento
-        paymentVC.products = products  // Passa os produtos do carrinho
-        paymentVC.cartProducts = cartProducts  // Passa os produtos do carrinho
+        paymentVC.totalAmount = calculateTotal()
+        paymentVC.products = products
+        paymentVC.cartProducts = cartProducts
         navigationController?.pushViewController(paymentVC, animated: true)
     }
 }

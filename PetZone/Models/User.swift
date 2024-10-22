@@ -1,10 +1,3 @@
-//
-//  User.swift
-//  PetZone
-//
-//  Created by user264582 on 10/19/24.
-//
-
 import Foundation
 import ParseSwift
 

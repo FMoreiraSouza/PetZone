@@ -1,13 +1,11 @@
 import UIKit
 
-// MARK: - PaymentViewController
-
 class PaymentViewController: UIViewController {
 
-    var totalAmount: Double = 0.0 // Total a ser pago
+    var totalAmount: Double = 0.0
     var cartProducts: [Cart] = []
     var products: [Product] = []
-    private var pixCodeGenerated = false // Flag para saber se o código Pix foi gerado
+    private var pixCodeGenerated = false
 
     private let totalLabel: UILabel = {
         let label = UILabel()
@@ -18,7 +16,7 @@ class PaymentViewController: UIViewController {
 
     private let paymentMethodSegmentedControl: UISegmentedControl = {
         let segmentedControl = UISegmentedControl(items: ["Pix", "Cartão"])
-        segmentedControl.selectedSegmentIndex = 0 // Seleciona Pix por padrão
+        segmentedControl.selectedSegmentIndex = 0
         segmentedControl.translatesAutoresizingMaskIntoConstraints = false
         return segmentedControl
     }()
@@ -36,15 +34,10 @@ class PaymentViewController: UIViewController {
         view.backgroundColor = .systemBackground
         setupUI()
         updateTotalLabel()
-        updatePayButtonTitle() // Atualiza o título do botão ao carregar a view
-
-        // Adiciona um observador para mudanças no segmentedControl
+        updatePayButtonTitle()
         paymentMethodSegmentedControl.addTarget(self, action: #selector(paymentMethodChanged), for: .valueChanged)
-
-        // Observa quando o app retorna para o estado ativo (após ser minimizado)
         NotificationCenter.default.addObserver(self, selector: #selector(handleAppDidBecomeActive), name: UIApplication.didBecomeActiveNotification, object: nil)
-
-        printCartProducts() // Imprime a lista de produtos do carrinho na debug area
+        printCartProducts()
         printProducts()
     }
 
@@ -54,7 +47,6 @@ class PaymentViewController: UIViewController {
         } else {
             print("Produtos no carrinho:")
             for product in cartProducts {
-                // Exibe informações do produto
                 let name = product.name ?? "Produto desconhecido"
                 let price = product.price ?? 0.0
                 let quantity = product.quantity ?? 0
@@ -69,7 +61,6 @@ class PaymentViewController: UIViewController {
         } else {
             print("Produtos na loja:")
             for product in products {
-                // Exibe informações do produto
                 let name = product.name ?? "Produto desconhecido"
                 let price = product.price ?? 0.0
                 let quantity = product.quantity ?? 0
@@ -78,16 +69,11 @@ class PaymentViewController: UIViewController {
         }
     }
 
-    // Método para imprimir produtos correspondentes ao carrinho
     private func printPurchasedProducts() {
-        // Cria um array para armazenar os produtos comprados
         var purchasedProducts: [Product] = []
-
-        // Filtra os produtos do carrinho e os adiciona à lista de comprados
         for cartItem in cartProducts {
-            // Acessa o produto a partir do Pointer
-            if let productPointer = cartItem.productId, // productId é do tipo Pointer<Product>
-               let product = products.first(where: { $0.id == productPointer.objectId}) { // Acessa o id do produto
+            if let productPointer = cartItem.productId,
+               let product = products.first(where: { $0.id == productPointer.objectId }) {
                 purchasedProducts.append(product)
             }
         }
@@ -99,7 +85,6 @@ class PaymentViewController: UIViewController {
             for product in purchasedProducts {
                 let name = product.name ?? "Produto desconhecido"
                 let price = product.price ?? 0.0
-                // Obtém a quantidade do produto no carrinho
                 let quantity = product.quantity ?? 0
                 print("Produto: \(name), Preço: $\(price), Quantidade: \(quantity)")
             }
@@ -108,39 +93,24 @@ class PaymentViewController: UIViewController {
     
     private func updateProductQuantities() {
         for cartItem in cartProducts {
-            // Acessa o produto a partir do Pointer
-            if let productPointer = cartItem.productId, // productId é do tipo Pointer<Product>
-               let product = products.first(where: { $0.id == productPointer.objectId }) { // Acessa o id do produto
-
-                // Garante que as quantidades não sejam nil
-                let productQuantity = product.quantity ?? 0 // Usa 0 se a quantidade for nil
-                let cartItemQuantity = cartItem.quantity ?? 0 // Usa 0 se a quantidade for nil
-                
-                // Calcula a nova quantidade
+            if let productPointer = cartItem.productId,
+               let product = products.first(where: { $0.id == productPointer.objectId }) {
+                let productQuantity = product.quantity ?? 0
+                let cartItemQuantity = cartItem.quantity ?? 0
                 let newQuantity = productQuantity - cartItemQuantity
-                
-                // Atualiza a quantidade do produto no banco
                 updateProductQuantityInDatabase(productId: product.id, newQuantity: newQuantity)
             }
         }
     }
 
-  
     private func updateProductQuantityInDatabase(productId: String, newQuantity: Int) {
-        // Cria uma nova query para o Parse
         let query = Product.query()
-        
-        // Busca o objeto no banco
         query.find { result in
             switch result {
             case .success(let results):
-                // Filtra o produto que corresponde ao productId
                 if var parseProduct = results.first(where: { $0.id == productId }) {
-                    // Atualiza a quantidade, mas não altera o campo `image`
                     parseProduct.quantity = newQuantity
-                    
-                    // Salva as mudanças
-                    parseProduct.save {  saveResult in
+                    parseProduct.save { saveResult in
                         switch saveResult {
                         case .success:
                             print("Quantidade do produto \(productId) atualizada para \(newQuantity).")
@@ -157,12 +127,7 @@ class PaymentViewController: UIViewController {
         }
     }
 
-
-
-
-    // Detecta quando o usuário retorna ao app
     @objc private func handleAppDidBecomeActive() {
-        // Verifica se o código Pix foi gerado e o app foi colocado em segundo plano
         if pixCodeGenerated {
             showPixPaymentConfirmation()
         }
@@ -176,10 +141,8 @@ class PaymentViewController: UIViewController {
         NSLayoutConstraint.activate([
             totalLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             totalLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 100),
-
             paymentMethodSegmentedControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             paymentMethodSegmentedControl.topAnchor.constraint(equalTo: totalLabel.bottomAnchor, constant: 20),
-
             payButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             payButton.topAnchor.constraint(equalTo: paymentMethodSegmentedControl.bottomAnchor, constant: 20),
             payButton.heightAnchor.constraint(equalToConstant: 50),
@@ -195,49 +158,38 @@ class PaymentViewController: UIViewController {
         payButton.setTitle(buttonTitle, for: .normal)
     }
 
-    // MARK: - Função para simular o pagamento
     @objc private func confirmPayment() {
         let selectedPaymentMethod = paymentMethodSegmentedControl.selectedSegmentIndex == 0 ? "Pix" : "Cartão"
 
         if selectedPaymentMethod == "Pix" {
-            let paymentCode = generatePaymentCode() // Gera um código de pagamento
-            UIPasteboard.general.string = paymentCode // Copia o código para a área de transferência
-            pixCodeGenerated = true // Marca que o código foi gerado
+            let paymentCode = generatePaymentCode()
+            UIPasteboard.general.string = paymentCode
+            pixCodeGenerated = true
 
-            // Exibir um alerta de confirmação com o código
             let alert = UIAlertController(title: "Pagamento via Pix", message: "Copie o código a seguir para realizar o pagamento: \n\n\(paymentCode)", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "Copiar", style: .default, handler: nil))
             present(alert, animated: true, completion: nil)
         } else {
-            // Para a opção Cartão, não fazemos nada por enquanto
             let alert = UIAlertController(title: "Método de Pagamento", message: "Você selecionou Cartão. Esta opção ainda não está disponível.", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
             present(alert, animated: true, completion: nil)
         }
     }
 
-    // MARK: - Função para gerar um código de pagamento fictício
     private func generatePaymentCode() -> String {
-        // Gera um código fictício (ex: "PIX123456789")
         let code = "PIX\(Int.random(in: 100000000...999999999))"
         return code
     }
 
-    // Exibe confirmação de pagamento
-    // Exibe confirmação de pagamento
     private func showPixPaymentConfirmation() {
-        // Simula que o pagamento foi feito ao voltar ao app
         let alert = UIAlertController(title: "Pagamento Confirmado", message: "Seu pagamento via Pix foi confirmado com sucesso!", preferredStyle: .alert)
 
-        // Adiciona uma ação que redireciona para a tela inicial (Home)
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
-            self.printPurchasedProducts() // Imprime a lista de produtos correspondentes ao carrinho
-            self.updateProductQuantities() // Atualiza as quantidades no banco
-            
-            // Limpa a tabela Cart
+            self.printPurchasedProducts()
+            self.updateProductQuantities()
             self.clearCart { success in
                 if success {
-                    self.navigateToHome() // Navega para a tela inicial após limpar o carrinho
+                    self.navigateToHome()
                 } else {
                     print("Erro ao limpar o carrinho.")
                 }
@@ -245,31 +197,28 @@ class PaymentViewController: UIViewController {
         }))
 
         present(alert, animated: true, completion: nil)
-
-        pixCodeGenerated = false // Reseta a flag após confirmação
+        pixCodeGenerated = false
     }
 
-    // Função para limpar todos os itens da tabela Cart
     private func clearCart(completion: @escaping (Bool) -> Void) {
         let query = Cart.query()
 
         query.find { result in
             switch result {
             case .success(let cartItems):
-                // Utiliza Task para gerenciar operações assíncronas
                 Task {
                     do {
                         try await withThrowingTaskGroup(of: Void.self) { group in
                             for cartItem in cartItems {
                                 group.addTask {
-                                    try await cartItem.delete() // Adiciona o 'try' para lidar com exceção
+                                    try await cartItem.delete()
                                 }
                             }
                         }
-                        completion(true) // Sucesso ao remover todos os itens
+                        completion(true)
                     } catch {
                         print("Erro ao remover os itens do carrinho: \(error.localizedDescription)")
-                        completion(false) // Falha ao remover os itens
+                        completion(false)
                     }
                 }
             case .failure(let error):
@@ -279,16 +228,12 @@ class PaymentViewController: UIViewController {
         }
     }
 
-
-
-    // Função para redirecionar o usuário para a tela inicial
     private func navigateToHome() {
-        let homeViewController = HomeViewController() // Instancia a tela de Home (substitua pelo seu controlador de Home real)
-        navigationController?.setViewControllers([homeViewController], animated: true) // Redireciona para a Home limpando a pilha de navegação
+        let homeViewController = HomeViewController()
+        navigationController?.setViewControllers([homeViewController], animated: true)
     }
 
-    // MARK: - Função chamada quando o método de pagamento é alterado
     @objc private func paymentMethodChanged() {
-        updatePayButtonTitle() // Atualiza o título do botão
+        updatePayButtonTitle()
     }
 }

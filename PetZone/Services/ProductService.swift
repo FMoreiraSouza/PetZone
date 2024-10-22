@@ -3,7 +3,8 @@ import ParseSwift
 
 class ProductService {
 
-    func fetchProducts(completion: @escaping (Result<[Product], Error>) -> Void) {
+    func fetchProducts(completion: @escaping (Result<[Product], Error>) -> Void)
+    {
         let query = Product.query()
 
         query.find { result in
@@ -15,7 +16,5 @@ class ProductService {
             }
         }
     }
-
-  
 
 }

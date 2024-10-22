@@ -18,13 +18,10 @@ class CartTableCell: UITableViewCell {
 
     private let dividerView: UIView = {
         let view = UIView()
-        view.backgroundColor = .lightGray // Cor do divisor
+        view.backgroundColor = .lightGray
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
-
-    // Closure to handle quantity change
-    var onQuantityChange: ((Int) -> Void)?
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -37,33 +34,29 @@ class CartTableCell: UITableViewCell {
 
     private func setupViews() {
         contentView.addSubview(productDetailsLabel)
-        contentView.addSubview(dividerView) // Adiciona o divisor à célula
+        contentView.addSubview(dividerView)
 
         NSLayoutConstraint.activate([
-            productDetailsLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            productDetailsLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            productDetailsLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
-            
-            // Define a posição do divisor abaixo do label
-            dividerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            dividerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            dividerView.topAnchor.constraint(equalTo: productDetailsLabel.bottomAnchor, constant: 10), // Espaçamento entre o label e o divisor
-            dividerView.heightAnchor.constraint(equalToConstant: 1), // Altura do divisor
+            productDetailsLabel.leadingAnchor.constraint(
+                equalTo: contentView.leadingAnchor, constant: 20),
+            productDetailsLabel.trailingAnchor.constraint(
+                equalTo: contentView.trailingAnchor, constant: -20),
+            productDetailsLabel.topAnchor.constraint(
+                equalTo: contentView.topAnchor, constant: 10),
 
-            dividerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor) // O divisor vai até a parte inferior da célula
+            dividerView.leadingAnchor.constraint(
+                equalTo: contentView.leadingAnchor, constant: 16),
+            dividerView.trailingAnchor.constraint(
+                equalTo: contentView.trailingAnchor, constant: -16),
+            dividerView.topAnchor.constraint(
+                equalTo: productDetailsLabel.bottomAnchor, constant: 10),
+            dividerView.heightAnchor.constraint(equalToConstant: 1),
+
+            dividerView.bottomAnchor.constraint(
+                equalTo: contentView.bottomAnchor),
         ])
     }
 
-    // MARK: - Funções para aumentar ou diminuir a quantidade
-    @objc private func decreaseQuantity() {
-        onQuantityChange?(-1)  // Chama a closure com -1 para diminuir
-    }
-
-    @objc private func increaseQuantity() {
-        onQuantityChange?(1)  // Chama a closure com +1 para aumentar
-    }
-
-    // MARK: - Função para configurar a célula com detalhes do produto
     func configure(with details: String) {
         productDetailsLabel.text = details
     }

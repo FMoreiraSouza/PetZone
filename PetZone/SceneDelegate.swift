@@ -1,10 +1,3 @@
-//
-//  SceneDelegate.swift
-//  PetZone
-//
-//  Created by user264582 on 10/16/24.
-//
-
 import UIKit
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
@@ -19,10 +12,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         guard let windowScene = (scene as? UIWindowScene) else { return }
-    
+
         window = UIWindow(windowScene: windowScene)
         window?.rootViewController = UINavigationController(
-            rootViewController: HomeViewController())
+            rootViewController: WelcomeViewController())
         window?.makeKeyAndVisible()
     }
 
@@ -54,7 +47,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // to restore the scene back to its current state.
 
         // Save changes in the application's managed object context when the application transitions to the background.
-//        (UIApplication.shared.delegate as? AppDelegate)?.saveContext()
+        //        (UIApplication.shared.delegate as? AppDelegate)?.saveContext()
     }
 
 }

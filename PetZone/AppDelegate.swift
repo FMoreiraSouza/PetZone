@@ -1,13 +1,6 @@
-//
-//  AppDelegate.swift
-//  PetZone
-//
-//  Created by user264582 on 10/16/24.
-//
-
 import CoreData
-import UIKit
 import ParseSwift
+import UIKit
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -17,7 +10,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         didFinishLaunchingWithOptions launchOptions: [UIApplication
             .LaunchOptionsKey: Any]?
     ) -> Bool {
-        ParseSwift.initialize(applicationId: "H22BV9kcM24RJivNHcGuyTPtJea0wc9LDXnrZ0F3", clientKey: "hZHhr6qbPcSOQ1RoninUNI6k0cH7XEV77jm3vR1g", serverURL: URL(string: "https://parseapi.back4app.com")!)
+        ParseSwift.initialize(
+            applicationId: "H22BV9kcM24RJivNHcGuyTPtJea0wc9LDXnrZ0F3",
+            clientKey: "hZHhr6qbPcSOQ1RoninUNI6k0cH7XEV77jm3vR1g",
+            serverURL: URL(string: "https://parseapi.back4app.com")!)
         return true
     }
 

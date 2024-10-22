@@ -1,19 +1,17 @@
 import ParseSwift
+import SpriteKit
 import UIKit
 
 class HomeViewController: UIViewController, UITableViewDelegate,
     UITableViewDataSource, ProductTableCellDelegate
 {
 
-    // Conformando ao protocolo
-
     let sideMenuWidth: CGFloat = 250
     var sideMenu: SideMenuViewController!
     var isSideMenuOpen = false
     let titleLabel = UILabel()
-    let cartService = CartService()  // Instância do CartService
+    let cartService = CartService()
 
-    // Tabela para exibir os produtos
     let tableView = UITableView()
     var products: [Product] = []
 
@@ -26,8 +24,8 @@ class HomeViewController: UIViewController, UITableViewDelegate,
         setupNavigationBar()
         setupTitleLabel()
         setupTapGesture()
-        setupTableView()  // Configure a tabela
-        fetchProducts()  // Busque os produtos
+        setupTableView()
+        fetchProducts()
     }
 
     func setupTableView() {
@@ -40,7 +38,6 @@ class HomeViewController: UIViewController, UITableViewDelegate,
 
         view.addSubview(tableView)
 
-        // Configura as constraints da tabela
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(
                 equalTo: titleLabel.bottomAnchor, constant: 16),
@@ -63,21 +60,33 @@ class HomeViewController: UIViewController, UITableViewDelegate,
         }
     }
 
+    func showCartAnimation() {
+        let skView = SKView(frame: view.bounds)
+        skView.backgroundColor = .clear
+
+        view.addSubview(skView)
+
+        let scene = CartAnimationScene(size: skView.bounds.size)
+        scene.scaleMode = .aspectFill
+        skView.presentScene(scene)
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            skView.removeFromSuperview()
+        }
+    }
+
     func didTapPlusButton(with product: Product) {
-        // Verifica se o produto já está no carrinho
         if let index = cart.firstIndex(where: { $0.id == product.id }) {
-            // Se o produto já estiver no carrinho, aumenta a quantidade em 1
+
             cart[index].quantity! += 1
 
-            // Atualiza a quantidade no Back4App
             updateProductInBack4App(productId: product.objectId ?? "")
         } else {
-            // Se o produto não estiver no carrinho, adiciona-o com quantidade 1
+
             var newProduct = product
             newProduct.quantity = 1
             cart.append(newProduct)
 
-            // Salvar o novo produto no Back4App
             saveProductToBack4App(
                 productId: product.objectId ?? "",
                 name: product.name ?? "",
@@ -86,11 +95,11 @@ class HomeViewController: UIViewController, UITableViewDelegate,
             )
         }
 
-        // Atualiza a interface ou mostra uma mensagem de sucesso
         print("Produto \(product.name ?? "") adicionado ao carrinho.")
-    }
 
-    // MARK: - UITableViewDataSource
+        showCartAnimation()
+
+    }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int)
         -> Int
@@ -106,29 +115,26 @@ class HomeViewController: UIViewController, UITableViewDelegate,
                 withIdentifier: ProductTableCell.identifier, for: indexPath)
             as! ProductTableCell
         let product = products[indexPath.row]
-        cell.configure(with: product)  // Configura a célula com o produto
-        cell.delegate = self  // Define o delegate da célula
+        cell.configure(with: product)
+        cell.delegate = self
         return cell
     }
 
-    // MARK: - ProductTableCellDelegate
-
-    var cart: [Product] = []  // Array para armazenar os produtos no carrinho
+    var cart: [Product] = []
 
     func updateProductInBack4App(productId: String) {
-        // Buscando todos os objetos Cart no Back4App
+
         let query = Cart.query()
         query.find { result in
             switch result {
             case .success(let results):
-                // Filtra o produto que corresponde ao productId
+
                 if var existingCart = results.first(where: {
                     $0.productId!.objectId == productId
                 }) {
-                    // Incrementa a quantidade
+
                     existingCart.quantity = existingCart.quantity! + 1
 
-                    // Salva as mudanças
                     existingCart.save { saveResult in
                         switch saveResult {
                         case .success:
@@ -155,16 +161,14 @@ class HomeViewController: UIViewController, UITableViewDelegate,
     func saveProductToBack4App(
         productId: String, name: String, price: Double, quantity: Int32
     ) {
-        var cart = Cart()  // Instancia um novo objeto Cart
+        var cart = Cart()
 
-        // Atribuindo valores aos campos
         cart.name = name
         cart.price = price
         cart.quantity = Int(quantity)
         let productPointer = Pointer<Product>(objectId: productId)
-        cart.productId = productPointer  // Atribui o Pointer ao campo productId
+        cart.productId = productPointer
 
-        // Salvar o produto no Back4App
         cart.save { result in
             switch result {
             case .success:
@@ -182,7 +186,6 @@ class HomeViewController: UIViewController, UITableViewDelegate,
     ) {
         let query = Cart.query
 
-        // Executando a consulta
         query.find { result in
             switch result {
             case .success(let items):
@@ -203,22 +206,22 @@ class HomeViewController: UIViewController, UITableViewDelegate,
         }
     }
 
-    // MARK: - UITableViewDelegate
+    
     func tableView(
         _ tableView: UITableView, didSelectRowAt indexPath: IndexPath
     ) {
         let product = products[indexPath.row]
 
-        // Cria e exibe o diálogo com as informações do produto
+    
         showProductDetails(product: product)
 
-        // Desseleciona a célula após o clique
+    
         tableView.deselectRow(at: indexPath, animated: true)
     }
 
-    // Função para exibir o UIAlertController com detalhes do produto
+    
     func showProductDetails(product: Product) {
-        // Formatar a data de validade
+        
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .medium
         dateFormatter.timeStyle = .none
@@ -245,10 +248,6 @@ class HomeViewController: UIViewController, UITableViewDelegate,
         present(alertController, animated: true, completion: nil)
     }
 
-    // O resto do código permanece inalterado...
-
-    // MARK: - Configurações adicionais
-
     func setupNavigationBar() {
         let menuButton = UIButton(type: .system)
         menuButton.setImage(
@@ -268,9 +267,18 @@ class HomeViewController: UIViewController, UITableViewDelegate,
     func setupSideMenu() {
         sideMenu = SideMenuViewController()
         sideMenu.homeViewController = self
+
+        let sideMenuWidth: CGFloat = 200
+
+        let sideMenuHeight = view.frame.height / 3.5
+
         sideMenu.view.frame = CGRect(
             x: -sideMenuWidth, y: 0, width: sideMenuWidth,
-            height: view.frame.height)
+            height: sideMenuHeight
+        )
+
+        sideMenu.view.layer.cornerRadius = 20
+        sideMenu.view.layer.masksToBounds = true
 
         if let window = UIApplication.shared.windows.first {
             window.addSubview(sideMenu.view)
@@ -279,66 +287,60 @@ class HomeViewController: UIViewController, UITableViewDelegate,
             sideMenu.view.layer.shadowOffset = CGSize(width: -5, height: 0)
             sideMenu.view.layer.shadowRadius = 5
         }
+
         addChild(sideMenu)
         sideMenu.didMove(toParent: self)
     }
 
     func setupTitleLabel() {
-        // Criar o rótulo para o título
+
         titleLabel.text = "PetZone"
         titleLabel.font = UIFont.systemFont(ofSize: 48, weight: .bold)
         titleLabel.textColor = UIColor.black
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
 
-        // Criar o ícone de carro de compras
         let cartIcon = UIImageView()
-        cartIcon.image = UIImage(systemName: "cart.fill")  // Use um ícone de carrinho de compras
+        cartIcon.image = UIImage(systemName: "cart.fill")
         cartIcon.tintColor = UIColor(
             red: 135 / 255, green: 206 / 255, blue: 250 / 255, alpha: 1)
         cartIcon.translatesAutoresizingMaskIntoConstraints = false
         cartIcon.contentMode = .scaleAspectFit
-        cartIcon.widthAnchor.constraint(equalToConstant: 40).isActive = true  // Largura do ícone
-        cartIcon.heightAnchor.constraint(equalToConstant: 40).isActive = true  // Altura do ícone
+        cartIcon.widthAnchor.constraint(equalToConstant: 40).isActive = true
+        cartIcon.heightAnchor.constraint(equalToConstant: 40).isActive = true
 
-        // Adicionar gesto de toque ao cartIcon
         let cartTapGesture = UITapGestureRecognizer(
             target: self, action: #selector(cartIconTapped))
         cartIcon.isUserInteractionEnabled = true
         cartIcon.addGestureRecognizer(cartTapGesture)
 
-        // Criar um stack view para organizar o rótulo e o ícone
         let titleStackView = UIStackView(arrangedSubviews: [
             titleLabel, cartIcon,
         ])
         titleStackView.axis = .horizontal
-        titleStackView.spacing = 8  // Espaçamento entre o título e o ícone
+        titleStackView.spacing = 8
         titleStackView.translatesAutoresizingMaskIntoConstraints = false
 
         view.addSubview(titleStackView)
 
-        // Ajuste as restrições para o stack view
         NSLayoutConstraint.activate([
             titleStackView.topAnchor.constraint(
                 equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
             titleStackView.leadingAnchor.constraint(
                 equalTo: view.leadingAnchor, constant: 16),
             titleStackView.trailingAnchor.constraint(
-                equalTo: view.trailingAnchor, constant: -16),  // Corrigido para usar view.trailingAnchor
+                equalTo: view.trailingAnchor, constant: -16),
         ])
     }
 
-    // Função chamada quando o cartIcon é clicado
     @objc func cartIconTapped() {
-        // Cria uma instância de CartViewController
+
         let cartViewController = CartViewController()
 
-        // Aqui você pode passar dados para o CartViewController, se necessário
-        // Exemplo: cartViewController.cartItems = cart
         cartViewController.products = products
-        // Transição para CartViewController
-        navigationController?.pushViewController(cartViewController, animated: true)
-    }
 
+        navigationController?.pushViewController(
+            cartViewController, animated: true)
+    }
 
     func setupTapGesture() {
         let tapGesture = UITapGestureRecognizer(
