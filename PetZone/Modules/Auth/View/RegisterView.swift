@@ -1,7 +1,6 @@
 import UIKit
 
 final class RegisterView: UIView {
-    
     let nameTextField = UITextField()
     let emailTextField = UITextField()
     let passwordTextField = UITextField()
@@ -15,6 +14,7 @@ final class RegisterView: UIView {
         setupView()
         setupConstraints()
         setupActions()
+        configureTextFields()
     }
     
     required init?(coder: NSCoder) {
@@ -23,7 +23,6 @@ final class RegisterView: UIView {
     
     private func setupView() {
         backgroundColor = .white
-        
         let textFields = [nameTextField, emailTextField, passwordTextField, confirmPasswordTextField]
         let placeholders = ["Nome", "E-mail", "Senha", "Confirme a Senha"]
         
@@ -35,11 +34,7 @@ final class RegisterView: UIView {
             field.layer.cornerRadius = 8.0
             field.translatesAutoresizingMaskIntoConstraints = false
             field.autocapitalizationType = .none
-            
-            if index >= 2 {
-                field.isSecureTextEntry = true
-            }
-            
+            if index >= 2 { field.isSecureTextEntry = true }
             addSubview(field)
         }
         
@@ -53,7 +48,6 @@ final class RegisterView: UIView {
     
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-            
             nameTextField.centerXAnchor.constraint(equalTo: centerXAnchor),
             nameTextField.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 100),
             nameTextField.widthAnchor.constraint(equalToConstant: 300),
@@ -85,6 +79,18 @@ final class RegisterView: UIView {
         registerButton.addTarget(self, action: #selector(registerButtonTapped), for: .touchUpInside)
     }
     
+    private func configureTextFields() {
+        let textFields = [nameTextField, emailTextField, passwordTextField, confirmPasswordTextField]
+        
+        for (index, field) in textFields.enumerated() {
+            field.delegate = self
+            field.returnKeyType = index < textFields.count - 1 ? .next : .go
+            field.tag = index
+        }
+        
+        nameTextField.autocapitalizationType = .words
+    }
+    
     @objc private func registerButtonTapped() {
         delegate?.didTapRegister(
             name: nameTextField.text,
@@ -92,5 +98,22 @@ final class RegisterView: UIView {
             password: passwordTextField.text,
             confirmPassword: confirmPasswordTextField.text
         )
+    }
+}
+
+extension RegisterView: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        if let nextField = self.viewWithTag(textField.tag + 1) as? UITextField {
+            nextField.becomeFirstResponder()
+        } else {
+            textField.resignFirstResponder()
+            delegate?.didTapRegister(
+                name: nameTextField.text,
+                email: emailTextField.text,
+                password: passwordTextField.text,
+                confirmPassword: confirmPasswordTextField.text
+            )
+        }
+        return true
     }
 }

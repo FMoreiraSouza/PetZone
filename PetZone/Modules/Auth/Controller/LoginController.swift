@@ -1,7 +1,6 @@
 import UIKit
 
 final class LoginController: UIViewController {
-    
     private let authService: AuthProtocol
     private lazy var loginView = LoginView()
     
@@ -17,6 +16,21 @@ final class LoginController: UIViewController {
     override func loadView() {
         view = loginView
         loginView.delegate = self
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupKeyboardDismissal()
+    }
+    
+    private func setupKeyboardDismissal() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        view.addGestureRecognizer(tapGesture)
+    }
+    
+    @objc private func dismissKeyboard() {
+        view.endEditing(true)
     }
     
     private func isValidEmail(_ email: String) -> Bool {
@@ -45,7 +59,8 @@ extension LoginController: LoginViewDelegate {
                 switch result {
                 case .success:
                     let homeVC = HomeController()
-                    self?.navigationController?.setViewControllers([homeVC], animated: true)
+                    let navController = UINavigationController(rootViewController: homeVC)
+                    UIApplication.shared.keyWindow?.rootViewController = navController
                 case .failure(let error):
                     self?.showError("Falha no login: \(error.localizedDescription)")
                 }

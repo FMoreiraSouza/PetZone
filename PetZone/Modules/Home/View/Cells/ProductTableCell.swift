@@ -60,13 +60,33 @@ final class ProductTableCell: UITableViewCell {
     }
     
     private func setupViews() {
-        contentView.addSubview(productImageView)
-        contentView.addSubview(productNameLabel)
-        contentView.addSubview(productPriceLabel)
-        contentView.addSubview(plusButton)
-        contentView.addSubview(divider)
-        
-        NSLayoutConstraint.activate([
+        let containerView = UIView()
+            containerView.backgroundColor = .white
+            containerView.layer.cornerRadius = 12
+            containerView.translatesAutoresizingMaskIntoConstraints = false
+            
+            let stackView = UIStackView(arrangedSubviews: [productImageView, productNameLabel, productPriceLabel])
+            stackView.axis = .horizontal
+            stackView.spacing = 16
+            stackView.alignment = .center
+            stackView.translatesAutoresizingMaskIntoConstraints = false
+            
+            containerView.addSubview(stackView)
+            contentView.addSubview(containerView)
+            contentView.addSubview(plusButton)
+            contentView.addSubview(divider)
+            
+            NSLayoutConstraint.activate([
+                containerView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
+                containerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+                containerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+                containerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
+                
+                stackView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 16),
+                stackView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
+                stackView.trailingAnchor.constraint(equalTo: plusButton.leadingAnchor, constant: -16),
+                stackView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -16),
+                
             productImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             productImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             productImageView.widthAnchor.constraint(equalToConstant: 80),
@@ -116,6 +136,8 @@ final class ProductTableCell: UITableViewCell {
     
     @objc private func plusButtonTapped() {
         guard let product = product else { return }
-        onPlusButtonTapped?(product)
+        DispatchQueue.main.async {
+            self.onPlusButtonTapped?(product)
+        }
     }
 }

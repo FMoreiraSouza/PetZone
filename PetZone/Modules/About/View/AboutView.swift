@@ -80,8 +80,7 @@ final class AboutView: UIView {
     
     private func createJustifiedText() -> NSAttributedString {
         let text = """
-        No PetZone, acreditamos que cada pet merece cuidado e carinho especial. Nosso aplicativo conecta você ao mundo de soluções para seu pet: 
-        desde serviços, cuidados, até dicas valiosas para tornar a vida do seu companheiro ainda mais feliz. Navegue com facilidade e descubra como o PetZone pode fazer parte da sua rotina de cuidado e amor!
+        No PetZone, acreditamos que cada pet merece cuidado e carinho especial. Nosso aplicativo conecta você ao mundo de soluções para seu pet: desde serviços, cuidados, até dicas valiosas para tornar a vida do seu companheiro ainda mais feliz. Navegue com facilidade e descubra como o PetZone pode fazer parte da sua rotina de cuidado e amor!
         """
         
         let paragraphStyle = NSMutableParagraphStyle()

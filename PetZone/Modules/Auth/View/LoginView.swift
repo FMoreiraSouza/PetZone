@@ -1,7 +1,6 @@
 import UIKit
 
 final class LoginView: UIView {
-    
     private lazy var logoImageView: UIImageView = {
         let imageView = UIImageView(image: UIImage(named: "LoginPet"))
         imageView.contentMode = .scaleAspectFit
@@ -67,6 +66,7 @@ final class LoginView: UIView {
         setupView()
         setupConstraints()
         setupActions()
+        configureTextFields()
     }
     
     required init?(coder: NSCoder) {
@@ -75,7 +75,6 @@ final class LoginView: UIView {
     
     private func setupView() {
         backgroundColor = UIColor(red: 1, green: 0.98, blue: 0.98, alpha: 1)
-        
         addSubview(logoImageView)
         addSubview(emailTextField)
         addSubview(passwordTextField)
@@ -122,6 +121,15 @@ final class LoginView: UIView {
         forgotPasswordButton.addTarget(self, action: #selector(forgotPasswordButtonTapped), for: .touchUpInside)
     }
     
+    private func configureTextFields() {
+        emailTextField.delegate = self
+        passwordTextField.delegate = self
+        emailTextField.returnKeyType = .next
+        passwordTextField.returnKeyType = .go
+        emailTextField.tag = 0
+        passwordTextField.tag = 1
+    }
+    
     @objc private func loginButtonTapped() {
         delegate?.didTapLogin(email: emailTextField.text, password: passwordTextField.text)
     }
@@ -132,5 +140,19 @@ final class LoginView: UIView {
     
     @objc private func forgotPasswordButtonTapped() {
         delegate?.didTapForgotPassword(email: emailTextField.text)
+    }
+}
+
+extension LoginView: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        if let nextField = self.viewWithTag(textField.tag + 1) as? UITextField {
+            nextField.becomeFirstResponder()
+        } else {
+            textField.resignFirstResponder()
+            if textField == passwordTextField {
+                delegate?.didTapLogin(email: emailTextField.text, password: passwordTextField.text)
+            }
+        }
+        return true
     }
 }
