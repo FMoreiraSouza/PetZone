@@ -1,8 +1,7 @@
-import ParseSwift
 import UIKit
+import ParseSwift
 
 final class SideMenuController: UIViewController {
-    
     weak var homeViewController: HomeController?
     private lazy var sideMenuView = SideMenuView()
     
@@ -33,23 +32,21 @@ final class SideMenuController: UIViewController {
     private func handleAboutTap() {
         let aboutVC = AboutController()
         navigationController?.pushViewController(aboutVC, animated: true)
-        closeSideMenu()
+        homeViewController?.toggleSideMenu()
     }
     
     private func handleLogoutTap() {
-        do {
-            if let currentUser = User.current {
-                try User.logout()
-                let loginVC = LoginController()
-                navigationController?.setViewControllers([loginVC], animated: true)
-                closeSideMenu()
+        AuthService.shared.logout { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    let loginVC = LoginController()
+                    let navController = UINavigationController(rootViewController: loginVC)
+                    UIApplication.shared.keyWindow?.rootViewController = navController
+                case .failure(let error):
+                    print("Erro ao sair: \(error.localizedDescription)")
+                }
             }
-        } catch {
-            print("Erro ao sair: \(error.localizedDescription)")
         }
-    }
-    
-    private func closeSideMenu() {
-        homeViewController?.toggleSideMenu()
     }
 }

@@ -53,25 +53,43 @@ final class HomeController: UIViewController {
     }
     
     private func setupSideMenu() {
-        sideMenu = SideMenuController()
-        sideMenu.homeViewController = self
-        let sideMenuHeight = view.frame.height / 3.5
-        sideMenu.view.frame = CGRect(x: -sideMenuWidth, y: 0,
-                                   width: sideMenuWidth, height: sideMenuHeight)
-        sideMenu.view.layer.cornerRadius = 20
-        sideMenu.view.layer.masksToBounds = true
-        
-        if let window = UIApplication.shared.windows.first {
-            window.addSubview(sideMenu.view)
-            sideMenu.view.layer.shadowColor = UIColor.black.cgColor
-            sideMenu.view.layer.shadowOpacity = 0.5
-            sideMenu.view.layer.shadowOffset = CGSize(width: -5, height: 0)
-            sideMenu.view.layer.shadowRadius = 5
-        }
-        
-        addChild(sideMenu)
-        sideMenu.didMove(toParent: self)
-    }
+         sideMenu = SideMenuController()
+         sideMenu.homeViewController = self
+         
+         DispatchQueue.main.async {
+             let sideMenuHeight = self.view.frame.height / 3.5
+             self.sideMenu.view.frame = CGRect(x: -self.sideMenuWidth, y: 0,
+                                            width: self.sideMenuWidth, height: sideMenuHeight)
+             
+             // Configurações de aparência
+             self.sideMenu.view.layer.cornerRadius = 20
+             self.sideMenu.view.layer.masksToBounds = true
+             
+             // Shadow configuration
+             self.sideMenu.view.layer.shadowColor = UIColor.black.cgColor
+             self.sideMenu.view.layer.shadowOpacity = 0.5
+             self.sideMenu.view.layer.shadowOffset = CGSize(width: 2, height: 0)
+             self.sideMenu.view.layer.shadowRadius = 5
+             
+             // Adicionar à janela principal
+             if let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) {
+                 window.addSubview(self.sideMenu.view)
+             }
+             
+             // Configurar hierarquia de view controllers
+             self.addChild(self.sideMenu)
+             self.sideMenu.didMove(toParent: self)
+         }
+     }
+     
+     @objc func toggleSideMenu() {
+         isSideMenuOpen.toggle()
+         let targetPosition = isSideMenuOpen ? 0 : -sideMenuWidth
+         
+         UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut, animations: {
+             self.sideMenu.view.frame.origin.x = CGFloat(targetPosition)
+         }, completion: nil)
+     }
     
     private func setupNavigationBar() {
         let menuButton = UIButton(type: .system)
@@ -99,14 +117,6 @@ final class HomeController: UIViewController {
         }
     }
     
-    @objc func toggleSideMenu() {
-        isSideMenuOpen.toggle()
-        let targetPosition = isSideMenuOpen ? 0 : -sideMenuWidth
-        
-        UIView.animate(withDuration: 0.3) {
-            self.sideMenu.view.frame.origin.x = CGFloat(targetPosition)
-        }
-    }
     
     @objc private func handleCartButtonTap() {
         let cartViewController = CartController()
@@ -137,50 +147,58 @@ final class HomeController: UIViewController {
         present(alertController, animated: true)
     }
     
-    private func showCartAnimation() {
-        let skView = SKView(frame: view.bounds)
-        skView.backgroundColor = .clear
-        view.addSubview(skView)
-        
-        let scene = CartAnimationScene(size: skView.bounds.size)
-        scene.scaleMode = .aspectFill
-        skView.presentScene(scene)
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            skView.removeFromSuperview()
-        }
-    }
-    
-    private func handleCartResult(_ result: Result<Void, ParseError>, product: Product) {
-        switch result {
-        case .success:
-            print("Produto \(product.name ?? "") adicionado ao carrinho.")
-            showCartAnimation()
-        case .failure(let error):
-            print("Falha ao atualizar carrinho: \(error.localizedDescription)")
-        }
-    }
-    
     private func handleAddToCart(product: Product) {
-        cartService.fetchCartItem(productId: product.objectId ?? "") { [weak self] (result: Result<Cart?, ParseError>) in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let cartItem):
-                    if cartItem != nil {
-                        self?.cartService.updateProductQuantity(productId: product.objectId ?? "") { result in
-                            self?.handleCartResult(result, product: product)
-                        }
-                    } else {
-                        self?.cartService.addProductToCart(product: product) { result in
-                            self?.handleCartResult(result, product: product)
-                        }
-                    }
-                case .failure(let error):
-                    print("Falha ao verificar carrinho: \(error.localizedDescription)")
-                }
-            }
-        }
-    }
+         cartService.fetchCartItem(productId: product.objectId ?? "") { [weak self] (result: Result<Cart?, ParseError>) in
+             switch result {
+             case .success(let cartItem):
+                 if cartItem != nil {
+                     self?.cartService.updateProductQuantity(productId: product.objectId ?? "") { result in
+                         DispatchQueue.main.async {
+                             self?.handleCartResult(result, product: product)
+                         }
+                     }
+                 } else {
+                     self?.cartService.addProductToCart(product: product) { result in
+                         DispatchQueue.main.async {
+                             self?.handleCartResult(result, product: product)
+                         }
+                     }
+                 }
+             case .failure(let error):
+                 DispatchQueue.main.async {
+                     print("Falha ao verificar carrinho: \(error.localizedDescription)")
+                 }
+             }
+         }
+     }
+     
+     private func handleCartResult(_ result: Result<Void, ParseError>, product: Product) {
+         DispatchQueue.main.async {
+             switch result {
+             case .success:
+                 print("Produto \(product.name ?? "") adicionado ao carrinho.")
+                 self.showCartAnimation()
+             case .failure(let error):
+                 print("Falha ao atualizar carrinho: \(error.localizedDescription)")
+             }
+         }
+     }
+     
+     private func showCartAnimation() {
+         DispatchQueue.main.async {
+             let skView = SKView(frame: self.view.bounds)
+             skView.backgroundColor = .clear
+             self.view.addSubview(skView)
+             
+             let scene = CartAnimationScene(size: skView.bounds.size)
+             scene.scaleMode = .aspectFill
+             skView.presentScene(scene)
+             
+             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                 skView.removeFromSuperview()
+             }
+         }
+     }
 }
 
 extension HomeController: UITableViewDelegate, UITableViewDataSource {
