@@ -1,15 +1,23 @@
 import UIKit
 
+struct CreditCardData {
+    let number: String
+    let holder: String
+    let expiry: String
+    let cvv: String
+}
+
 final class PaymentView: UIView {
     
     let totalLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 24, weight: .bold)
+        label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    let paymentMethodSegmentedControl: UISegmentedControl = {       
+    let paymentMethodSegmentedControl: UISegmentedControl = {
         let segmentedControl = UISegmentedControl(items: ["Pix", "Cartão"])
         segmentedControl.selectedSegmentIndex = 0
         segmentedControl.translatesAutoresizingMaskIntoConstraints = false
@@ -19,9 +27,15 @@ final class PaymentView: UIView {
     let payButton: UIButton = {
         let button = UIButton(type: .system)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .bold)
+        button.backgroundColor = .systemBlue
+        button.setTitleColor(.white, for: .normal)
+        button.layer.cornerRadius = 10
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
+    
+    var onCreditCardFormRequested: (() -> Void)?
+    var onCreditCardPayment: ((CreditCardData) -> Void)?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -44,12 +58,16 @@ final class PaymentView: UIView {
         NSLayoutConstraint.activate([
             totalLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
             totalLabel.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 100),
+            totalLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
+            totalLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
             
             paymentMethodSegmentedControl.centerXAnchor.constraint(equalTo: centerXAnchor),
-            paymentMethodSegmentedControl.topAnchor.constraint(equalTo: totalLabel.bottomAnchor, constant: 20),
+            paymentMethodSegmentedControl.topAnchor.constraint(equalTo: totalLabel.bottomAnchor, constant: 30),
+            paymentMethodSegmentedControl.widthAnchor.constraint(equalToConstant: 200),
             
             payButton.centerXAnchor.constraint(equalTo: centerXAnchor),
-            payButton.topAnchor.constraint(equalTo: paymentMethodSegmentedControl.bottomAnchor, constant: 20),
+            payButton.topAnchor.constraint(equalTo: paymentMethodSegmentedControl.bottomAnchor, constant: 30),
+            payButton.widthAnchor.constraint(equalToConstant: 200),
             payButton.heightAnchor.constraint(equalToConstant: 50),
         ])
     }
@@ -59,7 +77,77 @@ final class PaymentView: UIView {
     }
     
     func updatePayButtonTitle(isPixSelected: Bool) {
-        let buttonTitle = isPixSelected ? "Gerar Código Pix" : "Confirmar Pagamento"
+        let buttonTitle = isPixSelected ? "Gerar Código Pix" : "Adicionar cartão"
         payButton.setTitle(buttonTitle, for: .normal)
+    }
+    
+    func showCreditCardForm() {
+        presentCreditCardAlert()
+    }
+    
+    private func presentCreditCardAlert() {
+        guard let viewController = findViewController() else { return }
+        
+        let alert = UIAlertController(
+            title: "Pagamento com Cartão",
+            message: "Preencha os dados do cartão",
+            preferredStyle: .alert
+        )
+        
+        alert.addTextField { textField in
+            textField.placeholder = "Número do Cartão"
+            textField.keyboardType = .numberPad
+        }
+        
+        alert.addTextField { textField in
+            textField.placeholder = "Nome no Cartão"
+        }
+        
+        alert.addTextField { textField in
+            textField.placeholder = "Validade (MM/AA)"
+            textField.keyboardType = .numbersAndPunctuation
+        }
+        
+        alert.addTextField { textField in
+            textField.placeholder = "CVV"
+            textField.keyboardType = .numberPad
+            textField.isSecureTextEntry = true
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancelar", style: .cancel)
+        
+        let payAction = UIAlertAction(title: "Pagar", style: .default) { [weak self] _ in
+            guard let self = self else { return }
+            
+            let cardNumber = alert.textFields?[0].text ?? ""
+            let cardHolder = alert.textFields?[1].text ?? ""
+            let expiryDate = alert.textFields?[2].text ?? ""
+            let cvv = alert.textFields?[3].text ?? ""
+            
+            let creditCardData = CreditCardData(
+                number: cardNumber,
+                holder: cardHolder,
+                expiry: expiryDate,
+                cvv: cvv
+            )
+            
+            self.onCreditCardPayment?(creditCardData)
+        }
+        
+        alert.addAction(cancelAction)
+        alert.addAction(payAction)
+        
+        viewController.present(alert, animated: true)
+    }
+    
+    private func findViewController() -> UIViewController? {
+        var responder: UIResponder? = self
+        while let nextResponder = responder?.next {
+            if let viewController = nextResponder as? UIViewController {
+                return viewController
+            }
+            responder = nextResponder
+        }
+        return nil
     }
 }

@@ -36,26 +36,23 @@ final class PaymentService: PaymentProtocol {
     }
     
     func updateProductQuantity(productId: String, newQuantity: Int, completion: @escaping (Bool) -> Void) {
-        let query = Product.query()
-        query.find { result in
+        var query = Product.query("objectId" == productId)
+        
+        query.first { result in
             switch result {
-            case .success(let results):
-                if var parseProduct = results.first(where: { $0.id == productId }) {
-                    parseProduct.quantity = newQuantity
-                    parseProduct.save { saveResult in
-                        switch saveResult {
-                        case .success:
-                            print("Quantidade do produto \(productId) atualizada para \(newQuantity).")
-                            completion(true)
-                        case .failure(let error):
-                            print("Falha ao atualizar a quantidade do produto: \(error.localizedDescription)")
-                            completion(false)
-                        }
+            case .success(var product):
+                product.quantity = newQuantity                
+                product.save { saveResult in
+                    switch saveResult {
+                    case .success:
+                        print("Quantidade do produto \(productId) atualizada para \(newQuantity).")
+                        completion(true)
+                    case .failure(let error):
+                        print("Falha ao atualizar a quantidade do produto: \(error.localizedDescription)")
+                        completion(false)
                     }
-                } else {
-                    print("Produto com ID \(productId) não encontrado.")
-                    completion(false)
                 }
+                
             case .failure(let error):
                 print("Falha ao buscar o produto no Back4App: \(error.localizedDescription)")
                 completion(false)
