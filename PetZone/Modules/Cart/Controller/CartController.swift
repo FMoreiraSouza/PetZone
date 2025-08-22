@@ -43,7 +43,7 @@ final class CartController: UIViewController {
                     self?.cartView.tableView.reloadData()
                     self?.updateTotalLabel()
                 case .failure(let error):
-                    print("Erro ao buscar itens do carrinho: \(error.localizedDescription)")
+                    print("Erro ao buscar itens do carro de compras: \(error.localizedDescription)")
                 }
             }
         }

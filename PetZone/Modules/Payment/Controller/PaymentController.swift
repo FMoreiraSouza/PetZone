@@ -58,12 +58,12 @@ final class PaymentController: UIViewController {
             for: .touchUpInside
         )
         
-        paymentView.onCreditCardPayment = { [weak self] cardData in
+        paymentView.onCreditCardPayment = { [weak self] cardNumber, cardHolder, expiryDate, cvv in
             self?.processCreditCardPayment(
-                cardNumber: cardData.number,
-                cardHolder: cardData.holder,
-                expiryDate: cardData.expiry,
-                cvv: cardData.cvv
+                cardNumber: cardNumber,
+                cardHolder: cardHolder,
+                expiryDate: expiryDate,
+                cvv: cvv
             )
         }
     }
@@ -109,7 +109,7 @@ final class PaymentController: UIViewController {
     }
     
     private func showProcessingAlert(completion: @escaping () -> Void) {
-        let alert = UIAlertController(title: "Processando pagamento...", message: nil, preferredStyle: .alert)
+        let alert = UIAlertController(title: "Processando pagamento", message: nil, preferredStyle: .alert)
         present(alert, animated: true)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
@@ -170,8 +170,8 @@ final class PaymentController: UIViewController {
         let dispatchGroup = DispatchGroup()
         var allUpdatesSuccessful = true
         
-        print("Iniciando atualização de quantidades...")
-        print("Produtos no carro de conpras: \(cartProducts.count)")
+        print("Iniciando atualização de quantidades")
+        print("Produtos no carro de compras: \(cartProducts.count)")
         
         for cartItem in cartProducts {
             if let productPointer = cartItem.productId,
@@ -219,11 +219,11 @@ final class PaymentController: UIViewController {
             DispatchQueue.main.async {
                 self?.paymentInProgress = false
                 if success {
-                    print("Carro de conpras limpo com sucesso")
+                    print("Carro de compras limpo com sucesso")
                     self?.navigateToHome()
                 } else {
-                    print("Falha ao limpar o carro de conpras")
-                    self?.showAlert(title: "Erro", message: "Não foi possível limpar o carro de conpras.")
+                    print("Falha ao limpar o carro de compras")
+                    self?.showAlert(title: "Erro", message: "Não foi possível limpar o carro de compras.")
                 }
             }
         }

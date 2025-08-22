@@ -1,12 +1,5 @@
 import UIKit
 
-struct CreditCardData {
-    let number: String
-    let holder: String
-    let expiry: String
-    let cvv: String
-}
-
 final class PaymentView: UIView {
     
     let totalLabel: UILabel = {
@@ -27,15 +20,14 @@ final class PaymentView: UIView {
     let payButton: UIButton = {
         let button = UIButton(type: .system)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .bold)
-        button.backgroundColor = .systemBlue
-        button.setTitleColor(.white, for: .normal)
-        button.layer.cornerRadius = 10
+        button.setTitleColor(.systemBlue, for: .normal)
+        button.backgroundColor = .clear
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
     var onCreditCardFormRequested: (() -> Void)?
-    var onCreditCardPayment: ((CreditCardData) -> Void)?
+    var onCreditCardPayment: ((String, String, String, String) -> Void)?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -124,14 +116,7 @@ final class PaymentView: UIView {
             let expiryDate = alert.textFields?[2].text ?? ""
             let cvv = alert.textFields?[3].text ?? ""
             
-            let creditCardData = CreditCardData(
-                number: cardNumber,
-                holder: cardHolder,
-                expiry: expiryDate,
-                cvv: cvv
-            )
-            
-            self.onCreditCardPayment?(creditCardData)
+            self.onCreditCardPayment?(cardNumber, cardHolder, expiryDate, cvv)
         }
         
         alert.addAction(cancelAction)
