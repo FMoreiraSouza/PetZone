@@ -7,13 +7,10 @@ final class RegisterView: UIView {
     let confirmPasswordTextField = UITextField()
     let registerButton = UIButton()
     
-    weak var delegate: RegisterViewDelegate?
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupView()
         setupConstraints()
-        setupActions()
         configureTextFields()
     }
     
@@ -75,10 +72,6 @@ final class RegisterView: UIView {
         ])
     }
     
-    private func setupActions() {
-        registerButton.addTarget(self, action: #selector(registerButtonTapped), for: .touchUpInside)
-    }
-    
     private func configureTextFields() {
         let textFields = [nameTextField, emailTextField, passwordTextField, confirmPasswordTextField]
         
@@ -90,15 +83,6 @@ final class RegisterView: UIView {
         
         nameTextField.autocapitalizationType = .words
     }
-    
-    @objc private func registerButtonTapped() {
-        delegate?.didTapRegister(
-            name: nameTextField.text,
-            email: emailTextField.text,
-            password: passwordTextField.text,
-            confirmPassword: confirmPasswordTextField.text
-        )
-    }
 }
 
 extension RegisterView: UITextFieldDelegate {
@@ -107,12 +91,6 @@ extension RegisterView: UITextFieldDelegate {
             nextField.becomeFirstResponder()
         } else {
             textField.resignFirstResponder()
-            delegate?.didTapRegister(
-                name: nameTextField.text,
-                email: emailTextField.text,
-                password: passwordTextField.text,
-                confirmPassword: confirmPasswordTextField.text
-            )
         }
         return true
     }

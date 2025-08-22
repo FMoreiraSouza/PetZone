@@ -1,4 +1,5 @@
 import UIKit
+
 final class SideMenuView: UIView {
     
     private lazy var welcomeLabel: UILabel = {

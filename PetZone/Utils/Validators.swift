@@ -1,11 +1,3 @@
-//
-//  ValidationUtils.swift
-//  PetZone
-//
-//  Created by User on 21/08/25.
-//
-
-
 import Foundation
 
 struct ValidationUtils {

@@ -15,7 +15,7 @@ final class LoginController: UIViewController {
     
     override func loadView() {
         view = loginView
-        loginView.delegate = self
+        setupLoginActions()
     }
     
     override func viewDidLoad() {
@@ -32,24 +32,22 @@ final class LoginController: UIViewController {
     @objc private func dismissKeyboard() {
         view.endEditing(true)
     }
-    
-    private func isValidEmail(_ email: String) -> Bool {
-        let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}"
-        let emailTest = NSPredicate(format: "SELF MATCHES %@", emailRegEx)
-        return emailTest.evaluate(with: email)
-    }
-    
+        
     private func showError(_ message: String) {
         let alert = UIAlertController(title: "Erro", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
     }
-}
-
-extension LoginController: LoginViewDelegate {
-    func didTapLogin(email: String?, password: String?) {
-        guard let email = email, isValidEmail(email),
-              let password = password, password.count >= 6 else {
+    
+    private func setupLoginActions() {
+        loginView.loginButton.addTarget(self, action: #selector(loginButtonTapped), for: .touchUpInside)
+        loginView.registerButton.addTarget(self, action: #selector(registerButtonTapped), for: .touchUpInside)
+        loginView.forgotPasswordButton.addTarget(self, action: #selector(forgotPasswordButtonTapped), for: .touchUpInside)
+    }
+    
+    @objc private func loginButtonTapped() {
+        guard let email = loginView.emailTextField.text, ValidationUtils.isValidEmail(email),
+              let password = loginView.passwordTextField.text, ValidationUtils.isValidPassword(password) else {
             showError("Por favor, insira um email válido e uma senha com pelo menos 6 caracteres.")
             return
         }
@@ -60,7 +58,13 @@ extension LoginController: LoginViewDelegate {
                 case .success:
                     let homeVC = HomeController()
                     let navController = UINavigationController(rootViewController: homeVC)
-                    UIApplication.shared.keyWindow?.rootViewController = navController
+                    
+                    if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                       let window = windowScene.windows.first {
+                        window.rootViewController = navController
+                        window.makeKeyAndVisible()
+                    }
+                    
                 case .failure(let error):
                     self?.showError("Falha no login: \(error.localizedDescription)")
                 }
@@ -68,26 +72,26 @@ extension LoginController: LoginViewDelegate {
         }
     }
     
-    func didTapRegister() {
+    @objc private func registerButtonTapped() {
         let registerVC = RegisterController()
         navigationController?.pushViewController(registerVC, animated: true)
     }
     
-    func didTapForgotPassword(email: String?) {
+    @objc private func forgotPasswordButtonTapped() {
         let alert = UIAlertController(
             title: "Recuperar Senha",
             message: "Insira seu email para receber o link de recuperação.",
             preferredStyle: .alert
         )
         
-        alert.addTextField { textField in
+        alert.addTextField { [weak self] textField in
             textField.placeholder = "Email"
-            textField.text = email
+            textField.text = self?.loginView.emailTextField.text
             textField.keyboardType = .emailAddress
         }
         
         let sendAction = UIAlertAction(title: "Enviar", style: .default) { [weak self] _ in
-            guard let email = alert.textFields?.first?.text, !email.isEmpty else {
+            guard let email = alert.textFields?.first?.text, ValidationUtils.isValidEmail(email) else {
                 self?.showError("Email inválido.")
                 return
             }

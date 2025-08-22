@@ -1,28 +1,33 @@
 import Foundation
 import ParseSwift
 
-final class PaymentService: PaymentServiceProtocol {
+final class PaymentService: PaymentProtocol {
     func clearCart(completion: @escaping (Bool) -> Void) {
         let query = Cart.query()
         
         query.find { result in
             switch result {
             case .success(let cartItems):
-                Task {
-                    do {
-                        try await withThrowingTaskGroup(of: Void.self) { group in
-                            for cartItem in cartItems {
-                                group.addTask {
-                                    try await cartItem.delete()
-                                }
-                            }
+                let dispatchGroup = DispatchGroup()
+                var success = true
+                for cartItem in cartItems {
+                    dispatchGroup.enter()
+                    cartItem.delete { result in
+                        switch result {
+                        case .success:
+                            break
+                        case .failure(let error):
+                            print("Erro ao remover item do carrinho: \(error.localizedDescription)")
+                            success = false
                         }
-                        completion(true)
-                    } catch {
-                        print("Erro ao remover os itens do carrinho: \(error.localizedDescription)")
-                        completion(false)
+                        dispatchGroup.leave()
                     }
                 }
+                
+                dispatchGroup.notify(queue: .main) {
+                    completion(success)
+                }
+                
             case .failure(let error):
                 print("Erro ao buscar os itens do carrinho: \(error.localizedDescription)")
                 completion(false)

@@ -7,10 +7,10 @@ final class PaymentController: UIViewController {
     var products: [Product] = []
     
     private var pixCodeGenerated = false
-    private let paymentService: PaymentServiceProtocol
+    private let paymentService: PaymentProtocol
     private lazy var paymentView = PaymentView()
     
-    init(paymentService: PaymentServiceProtocol = PaymentService()) {
+    init(paymentService: PaymentProtocol = PaymentService()) {
         self.paymentService = paymentService
         super.init(nibName: nil, bundle: nil)
     }
@@ -25,7 +25,7 @@ final class PaymentController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupUI()
+        setupView()
         setupActions()
         NotificationCenter.default.addObserver(
             self, 
@@ -35,7 +35,7 @@ final class PaymentController: UIViewController {
         )
     }
     
-    private func setupUI() {
+    private func setupView() {
         paymentView.updateTotalLabel(amount: totalAmount)
         paymentView.updatePayButtonTitle(isPixSelected: true)
     }
