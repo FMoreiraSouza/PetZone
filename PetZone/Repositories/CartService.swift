@@ -2,7 +2,8 @@ import Foundation
 import ParseSwift
 
 final class CartService: CartProtocol {
-    func fetchCartItems(completion: @escaping (Result<[Cart], ParseError>) -> Void) {
+    
+    func fetchCartItems(completion: @escaping (Result<[Cart], Error>) -> Void) {
         let query = Cart.query()
         query.find { result in
             DispatchQueue.main.async {
@@ -16,13 +17,15 @@ final class CartService: CartProtocol {
         }
     }
     
-    func addProductToCart(product: Product, completion: @escaping (Result<Void, ParseError>) -> Void) {
+    func addProductToCart(product: Product, completion: @escaping (Result<Void, Error>) -> Void) {
         var cart = Cart()
         cart.name = product.name
         cart.price = product.price
         cart.quantity = 1
-        let productPointer = try? Pointer<Product>(objectId: product.objectId ?? "")
-        cart.productId = productPointer
+        
+        if let objectId = product.objectId {
+            cart.productId = Pointer<Product>(objectId: objectId)
+        }
         
         cart.save { result in
             DispatchQueue.main.async {
@@ -36,7 +39,7 @@ final class CartService: CartProtocol {
         }
     }
     
-    func updateProductQuantity(productId: String, completion: @escaping (Result<Void, ParseError>) -> Void) {
+    func updateProductQuantity(productId: String, completion: @escaping (Result<Void, Error>) -> Void) {
         let query = Cart.query()
         query.find { result in
             switch result {
@@ -54,7 +57,7 @@ final class CartService: CartProtocol {
                         }
                     }
                 } else {
-                    let error = ParseError(code: .objectNotFound, message: "Produto não encontrado no carrinho")
+                    let error = NSError(domain: "CartService", code: 404, userInfo: [NSLocalizedDescriptionKey: "Produto não encontrado no carrinho"])
                     DispatchQueue.main.async {
                         completion(.failure(error))
                     }
@@ -67,13 +70,14 @@ final class CartService: CartProtocol {
         }
     }
     
-    func fetchCartItem(productId: String, completion: @escaping (Result<Cart?, ParseError>) -> Void) {
+    func fetchCartItem(productId: String, completion: @escaping (Result<Cart?, Error>) -> Void) {
         let query = Cart.query()
         query.find { result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let items):
-                    completion(.success(items.first(where: { $0.productId?.objectId == productId })))
+                    let cartItem = items.first(where: { $0.productId?.objectId == productId })
+                    completion(.success(cartItem))
                 case .failure(let error):
                     completion(.failure(error))
                 }

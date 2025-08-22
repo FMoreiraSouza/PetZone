@@ -12,6 +12,7 @@ final class HomeController: UIViewController {
     private let sideMenuWidth: CGFloat = 250
     private var sideMenu: SideMenuController!
     private var isSideMenuOpen = false
+    private var tapGesture: UITapGestureRecognizer!
     
     init(productService: ProductProtocol = ProductService(),
          cartService: CartProtocol = CartService()) {
@@ -33,6 +34,7 @@ final class HomeController: UIViewController {
         setupUI()
         setupActions()
         fetchProducts()
+        setupTapGesture()
     }
     
     private func setupUI() {
@@ -50,46 +52,65 @@ final class HomeController: UIViewController {
         homeView.tableView.dataSource = self
         homeView.tableView.register(ProductTableCell.self,
                                   forCellReuseIdentifier: ProductTableCell.identifier)
+        homeView.tableView.rowHeight = 120
+        homeView.tableView.separatorStyle = .none
+    }
+    
+    private func setupTapGesture() {
+        tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTapOutsideMenu))
+        tapGesture.cancelsTouchesInView = false
+        tapGesture.isEnabled = false
+        view.addGestureRecognizer(tapGesture)
     }
     
     private func setupSideMenu() {
-         sideMenu = SideMenuController()
-         sideMenu.homeViewController = self
-         
-         DispatchQueue.main.async {
-             let sideMenuHeight = self.view.frame.height / 3.5
-             self.sideMenu.view.frame = CGRect(x: -self.sideMenuWidth, y: 0,
-                                            width: self.sideMenuWidth, height: sideMenuHeight)
-             
-             // Configurações de aparência
-             self.sideMenu.view.layer.cornerRadius = 20
-             self.sideMenu.view.layer.masksToBounds = true
-             
-             // Shadow configuration
-             self.sideMenu.view.layer.shadowColor = UIColor.black.cgColor
-             self.sideMenu.view.layer.shadowOpacity = 0.5
-             self.sideMenu.view.layer.shadowOffset = CGSize(width: 2, height: 0)
-             self.sideMenu.view.layer.shadowRadius = 5
-             
-             // Adicionar à janela principal
-             if let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) {
-                 window.addSubview(self.sideMenu.view)
-             }
-             
-             // Configurar hierarquia de view controllers
-             self.addChild(self.sideMenu)
-             self.sideMenu.didMove(toParent: self)
-         }
-     }
-     
-     @objc func toggleSideMenu() {
-         isSideMenuOpen.toggle()
-         let targetPosition = isSideMenuOpen ? 0 : -sideMenuWidth
-         
-         UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut, animations: {
-             self.sideMenu.view.frame.origin.x = CGFloat(targetPosition)
-         }, completion: nil)
-     }
+        sideMenu = SideMenuController()
+        sideMenu.homeViewController = self
+        
+        DispatchQueue.main.async {
+            let sideMenuHeight = self.view.frame.height / 3.5
+            self.sideMenu.view.frame = CGRect(x: -self.sideMenuWidth, y: 0,
+                                           width: self.sideMenuWidth, height: sideMenuHeight)
+            
+            self.sideMenu.view.layer.cornerRadius = 20
+            self.sideMenu.view.layer.masksToBounds = true
+            
+            self.sideMenu.view.layer.shadowColor = UIColor.black.cgColor
+            self.sideMenu.view.layer.shadowOpacity = 0.5
+            self.sideMenu.view.layer.shadowOffset = CGSize(width: 2, height: 0)
+            self.sideMenu.view.layer.shadowRadius = 5
+            
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let keyWindow = windowScene.windows.first(where: { $0.isKeyWindow }) {
+                keyWindow.addSubview(self.sideMenu.view)
+            }
+            
+            self.addChild(self.sideMenu)
+            self.sideMenu.didMove(toParent: self)
+        }
+    }
+    
+    @objc func toggleSideMenu() {
+        isSideMenuOpen.toggle()
+        let targetPosition = isSideMenuOpen ? 0 : -sideMenuWidth
+        
+        UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut, animations: {
+            self.sideMenu.view.frame.origin.x = CGFloat(targetPosition)
+        }) { _ in
+            self.tapGesture.isEnabled = self.isSideMenuOpen
+        }
+    }
+    
+    @objc private func handleTapOutsideMenu(_ gesture: UITapGestureRecognizer) {
+        let location = gesture.location(in: view)
+        
+        if isSideMenuOpen {
+            let menuFrame = sideMenu.view.frame
+            if !menuFrame.contains(location) {
+                toggleSideMenu()
+            }
+        }
+    }
     
     private func setupNavigationBar() {
         let menuButton = UIButton(type: .system)
@@ -104,7 +125,7 @@ final class HomeController: UIViewController {
     }
     
     private func fetchProducts() {
-        productService.fetchProducts { [weak self] (result: Result<[Product], ParseError>) in
+        productService.fetchProducts { [weak self] (result: Result<[Product], Error>) in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let products):
@@ -116,7 +137,6 @@ final class HomeController: UIViewController {
             }
         }
     }
-    
     
     @objc private func handleCartButtonTap() {
         let cartViewController = CartController()
@@ -148,57 +168,72 @@ final class HomeController: UIViewController {
     }
     
     private func handleAddToCart(product: Product) {
-         cartService.fetchCartItem(productId: product.objectId ?? "") { [weak self] (result: Result<Cart?, ParseError>) in
-             switch result {
-             case .success(let cartItem):
-                 if cartItem != nil {
-                     self?.cartService.updateProductQuantity(productId: product.objectId ?? "") { result in
-                         DispatchQueue.main.async {
-                             self?.handleCartResult(result, product: product)
-                         }
-                     }
-                 } else {
-                     self?.cartService.addProductToCart(product: product) { result in
-                         DispatchQueue.main.async {
-                             self?.handleCartResult(result, product: product)
-                         }
-                     }
-                 }
-             case .failure(let error):
-                 DispatchQueue.main.async {
-                     print("Falha ao verificar carrinho: \(error.localizedDescription)")
-                 }
-             }
-         }
-     }
-     
-     private func handleCartResult(_ result: Result<Void, ParseError>, product: Product) {
-         DispatchQueue.main.async {
-             switch result {
-             case .success:
-                 print("Produto \(product.name ?? "") adicionado ao carrinho.")
-                 self.showCartAnimation()
-             case .failure(let error):
-                 print("Falha ao atualizar carrinho: \(error.localizedDescription)")
-             }
-         }
-     }
-     
-     private func showCartAnimation() {
-         DispatchQueue.main.async {
-             let skView = SKView(frame: self.view.bounds)
-             skView.backgroundColor = .clear
-             self.view.addSubview(skView)
-             
-             let scene = CartAnimationScene(size: skView.bounds.size)
-             scene.scaleMode = .aspectFill
-             skView.presentScene(scene)
-             
-             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                 skView.removeFromSuperview()
-             }
-         }
-     }
+        guard let quantity = product.quantity, quantity > 0 else {
+            showAlert(title: "Produto Esgotado", message: "Este produto não está mais disponível.")
+            return
+        }
+        
+        cartService.fetchCartItem(productId: product.objectId ?? "") { [weak self] (result: Result<Cart?, Error>) in
+            switch result {
+            case .success(let cartItem):
+                if cartItem != nil {
+                    self?.cartService.updateProductQuantity(productId: product.objectId ?? "") { result in
+                        DispatchQueue.main.async {
+                            self?.handleCartResult(result, product: product)
+                        }
+                    }
+                } else {
+                    self?.cartService.addProductToCart(product: product) { result in
+                        DispatchQueue.main.async {
+                            self?.handleCartResult(result, product: product)
+                        }
+                    }
+                }
+            case .failure(let error):
+                DispatchQueue.main.async {
+                    print("Falha ao verificar carrinho: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+    
+    private func handleCartResult(_ result: Result<Void, Error>, product: Product) {
+        DispatchQueue.main.async {
+            switch result {
+            case .success:
+                print("Produto \(product.name ?? "") adicionado ao carrinho.")
+                self.showCartAnimation()
+                if let index = self.products.firstIndex(where: { $0.objectId == product.objectId }) {
+                    self.products[index].quantity = (self.products[index].quantity ?? 1) - 1
+                    self.homeView.tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+                }
+            case .failure(let error):
+                print("Falha ao atualizar carrinho: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    private func showCartAnimation() {
+        DispatchQueue.main.async {
+            let skView = SKView(frame: self.view.bounds)
+            skView.backgroundColor = .clear
+            self.view.addSubview(skView)
+            
+            let scene = AnimationScene(size: skView.bounds.size)
+            scene.scaleMode = .aspectFill
+            skView.presentScene(scene)
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                skView.removeFromSuperview()
+            }
+        }
+    }
+    
+    private func showAlert(title: String, message: String) {
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alertController, animated: true)
+    }
 }
 
 extension HomeController: UITableViewDelegate, UITableViewDataSource {
@@ -222,5 +257,19 @@ extension HomeController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         showProductDetails(products[indexPath.row])
         tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 120
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 12
+    }
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let headerView = UIView()
+        headerView.backgroundColor = .clear
+        return headerView
     }
 }

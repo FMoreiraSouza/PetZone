@@ -1,6 +1,6 @@
 import SpriteKit
 
-class CartAnimationScene: SKScene {
+class AnimationScene: SKScene {
 
     override func didMove(to view: SKView) {
         backgroundColor = .clear

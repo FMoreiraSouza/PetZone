@@ -15,7 +15,7 @@ final class RegisterController: UIViewController {
     
     override func loadView() {
         view = registerView
-        registerView.delegate = self
+        setupRegisterActions()
     }
     
     override func viewDidLoad() {
@@ -32,13 +32,7 @@ final class RegisterController: UIViewController {
     @objc private func dismissKeyboard() {
         view.endEditing(true)
     }
-    
-    private func isValidEmail(_ email: String) -> Bool {
-        let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}"
-        let emailTest = NSPredicate(format: "SELF MATCHES %@", emailRegEx)
-        return emailTest.evaluate(with: email)
-    }
-    
+        
     private func showAlert(title: String, message: String, completion: (() -> Void)? = nil) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default) { _ in
@@ -46,26 +40,29 @@ final class RegisterController: UIViewController {
         })
         present(alert, animated: true)
     }
-}
-
-extension RegisterController: RegisterViewDelegate {
-    func didTapRegister(name: String?, email: String?, password: String?, confirmPassword: String?) {
-        guard let name = name, !name.isEmpty else {
+    
+    private func setupRegisterActions() {
+        registerView.registerButton.addTarget(self, action: #selector(registerButtonTapped), for: .touchUpInside)
+    }
+    
+    @objc private func registerButtonTapped() {
+        guard let name = registerView.nameTextField.text, ValidationUtils.isValidName(name) else {
             showAlert(title: "Atenção", message: "Por favor, preencha o campo Nome.")
             return
         }
         
-        guard let email = email, isValidEmail(email) else {
+        guard let email = registerView.emailTextField.text, ValidationUtils.isValidEmail(email) else {
             showAlert(title: "Atenção", message: "Por favor, preencha um e-mail válido.")
             return
         }
         
-        guard let password = password, password.count >= 6 else {
+        guard let password = registerView.passwordTextField.text, ValidationUtils.isValidPassword(password) else {
             showAlert(title: "Atenção", message: "A senha deve ter pelo menos 6 caracteres.")
             return
         }
         
-        guard let confirmPassword = confirmPassword, confirmPassword == password else {
+        guard let confirmPassword = registerView.confirmPasswordTextField.text,
+              ValidationUtils.passwordsMatch(password, confirmPassword) else {
             showAlert(title: "Atenção", message: "As senhas não coincidem.")
             return
         }

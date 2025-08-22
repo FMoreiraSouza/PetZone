@@ -36,13 +36,19 @@ final class SideMenuController: UIViewController {
     }
     
     private func handleLogoutTap() {
-        AuthService.shared.logout { [weak self] result in
+        AuthService.shared.logout { result in
             DispatchQueue.main.async {
                 switch result {
                 case .success:
                     let loginVC = LoginController()
                     let navController = UINavigationController(rootViewController: loginVC)
-                    UIApplication.shared.keyWindow?.rootViewController = navController
+                    
+                    if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                       let window = windowScene.windows.first {
+                        window.rootViewController = navController
+                        window.makeKeyAndVisible()
+                    }
+                    
                 case .failure(let error):
                     print("Erro ao sair: \(error.localizedDescription)")
                 }

@@ -45,6 +45,20 @@ final class ProductTableCell: UITableViewCell {
         return view
     }()
     
+    private let soldOutLabel: UILabel = {
+        let label = UILabel()
+        label.text = "ESGOTADO"
+        label.font = UIFont.systemFont(ofSize: 12, weight: .bold)
+        label.textColor = .white
+        label.backgroundColor = .red
+        label.textAlignment = .center
+        label.layer.cornerRadius = 8
+        label.layer.masksToBounds = true
+        label.isHidden = true
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
     static let identifier = "ProductTableCell"
     var onPlusButtonTapped: ((Product) -> Void)?
     private var product: Product?
@@ -53,6 +67,8 @@ final class ProductTableCell: UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupViews()
         setupActions()
+        selectionStyle = .none
+        backgroundColor = .clear
     }
     
     required init?(coder: NSCoder) {
@@ -60,33 +76,14 @@ final class ProductTableCell: UITableViewCell {
     }
     
     private func setupViews() {
-        let containerView = UIView()
-            containerView.backgroundColor = .white
-            containerView.layer.cornerRadius = 12
-            containerView.translatesAutoresizingMaskIntoConstraints = false
-            
-            let stackView = UIStackView(arrangedSubviews: [productImageView, productNameLabel, productPriceLabel])
-            stackView.axis = .horizontal
-            stackView.spacing = 16
-            stackView.alignment = .center
-            stackView.translatesAutoresizingMaskIntoConstraints = false
-            
-            containerView.addSubview(stackView)
-            contentView.addSubview(containerView)
-            contentView.addSubview(plusButton)
-            contentView.addSubview(divider)
-            
-            NSLayoutConstraint.activate([
-                containerView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
-                containerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-                containerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-                containerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
-                
-                stackView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 16),
-                stackView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
-                stackView.trailingAnchor.constraint(equalTo: plusButton.leadingAnchor, constant: -16),
-                stackView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -16),
-                
+        contentView.addSubview(productImageView)
+        contentView.addSubview(productNameLabel)
+        contentView.addSubview(productPriceLabel)
+        contentView.addSubview(plusButton)
+        contentView.addSubview(soldOutLabel)
+        contentView.addSubview(divider)
+        
+        NSLayoutConstraint.activate([
             productImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             productImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             productImageView.widthAnchor.constraint(equalToConstant: 80),
@@ -105,6 +102,11 @@ final class ProductTableCell: UITableViewCell {
             plusButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             plusButton.widthAnchor.constraint(equalToConstant: 30),
             plusButton.heightAnchor.constraint(equalToConstant: 30),
+            
+            soldOutLabel.centerYAnchor.constraint(equalTo: plusButton.centerYAnchor),
+            soldOutLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            soldOutLabel.widthAnchor.constraint(equalToConstant: 80),
+            soldOutLabel.heightAnchor.constraint(equalToConstant: 25),
             
             divider.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             divider.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
@@ -126,6 +128,18 @@ final class ProductTableCell: UITableViewCell {
             productImageView.loadImage(from: imageUrl.absoluteString)
         } else {
             productImageView.image = UIImage(systemName: "photo")
+        }
+        
+        if let quantity = product.quantity, quantity <= 0 {
+            soldOutLabel.isHidden = false
+            plusButton.isHidden = true
+            productNameLabel.textColor = .lightGray
+            productPriceLabel.textColor = .lightGray
+        } else {
+            soldOutLabel.isHidden = true
+            plusButton.isHidden = false
+            productNameLabel.textColor = .black
+            productPriceLabel.textColor = .gray
         }
     }
     

@@ -1,12 +1,7 @@
 import UIKit
-
-protocol WelcomeViewDelegate: AnyObject {
-    func didTapLoginButton()
-}
-
 class WelcomeView: UIView {
     
-    weak var delegate: WelcomeViewDelegate?
+    var onLoginButtonTapped: (() -> Void)?
     
     private let logoImageView: UIImageView = {
         let iv = UIImageView(image: UIImage(named: "WelcomePet"))
@@ -17,16 +12,20 @@ class WelcomeView: UIView {
     
     private let titleLabel: UILabel = {
         let label = UILabel()
+        label.text = "Bem-vindo ao PetZone"
         label.font = UIFont.boldSystemFont(ofSize: 24)
         label.textAlignment = .center
+        label.textColor = .darkGray
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
     private let messageLabel: UILabel = {
         let label = UILabel()
+        label.text = "Seu pet shop digital!"
         label.textAlignment = .center
         label.numberOfLines = 0
+        label.textColor = .gray
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -87,13 +86,7 @@ class WelcomeView: UIView {
         loginButton.addTarget(self, action: #selector(loginButtonTapped), for: .touchUpInside)
     }
     
-    func configure(with model: WelcomeModel) {
-        titleLabel.text = model.title
-        messageLabel.text = model.message
-        backgroundColor = model.backgroundColor
-    }
-    
     @objc private func loginButtonTapped() {
-        delegate?.didTapLoginButton()
+        onLoginButtonTapped?()
     }
 }

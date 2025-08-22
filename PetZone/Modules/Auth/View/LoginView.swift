@@ -1,14 +1,14 @@
 import UIKit
 
 final class LoginView: UIView {
-    private lazy var logoImageView: UIImageView = {
+    let logoImageView: UIImageView = {
         let imageView = UIImageView(image: UIImage(named: "LoginPet"))
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
     
-    private lazy var emailTextField: UITextField = {
+    let emailTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = "Email"
         textField.borderStyle = .roundedRect
@@ -21,7 +21,7 @@ final class LoginView: UIView {
         return textField
     }()
     
-    private lazy var passwordTextField: UITextField = {
+    let passwordTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = "Senha"
         textField.isSecureTextEntry = true
@@ -33,7 +33,7 @@ final class LoginView: UIView {
         return textField
     }()
     
-    private lazy var loginButton: UIButton = {
+    let loginButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Entrar", for: .normal)
         button.backgroundColor = UIColor(red: 0.53, green: 0.81, blue: 0.92, alpha: 1.0)
@@ -43,7 +43,7 @@ final class LoginView: UIView {
         return button
     }()
     
-    private lazy var registerButton: UIButton = {
+    let registerButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Cadastre-se", for: .normal)
         button.setTitleColor(UIColor(red: 0.53, green: 0.81, blue: 0.92, alpha: 1.0), for: .normal)
@@ -51,7 +51,7 @@ final class LoginView: UIView {
         return button
     }()
     
-    private lazy var forgotPasswordButton: UIButton = {
+    let forgotPasswordButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Esqueci a senha", for: .normal)
         button.setTitleColor(UIColor(red: 0.53, green: 0.81, blue: 0.92, alpha: 1.0), for: .normal)
@@ -59,13 +59,10 @@ final class LoginView: UIView {
         return button
     }()
     
-    weak var delegate: LoginViewDelegate?
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupView()
         setupConstraints()
-        setupActions()
         configureTextFields()
     }
     
@@ -115,12 +112,6 @@ final class LoginView: UIView {
         ])
     }
     
-    private func setupActions() {
-        loginButton.addTarget(self, action: #selector(loginButtonTapped), for: .touchUpInside)
-        registerButton.addTarget(self, action: #selector(registerButtonTapped), for: .touchUpInside)
-        forgotPasswordButton.addTarget(self, action: #selector(forgotPasswordButtonTapped), for: .touchUpInside)
-    }
-    
     private func configureTextFields() {
         emailTextField.delegate = self
         passwordTextField.delegate = self
@@ -128,18 +119,6 @@ final class LoginView: UIView {
         passwordTextField.returnKeyType = .go
         emailTextField.tag = 0
         passwordTextField.tag = 1
-    }
-    
-    @objc private func loginButtonTapped() {
-        delegate?.didTapLogin(email: emailTextField.text, password: passwordTextField.text)
-    }
-    
-    @objc private func registerButtonTapped() {
-        delegate?.didTapRegister()
-    }
-    
-    @objc private func forgotPasswordButtonTapped() {
-        delegate?.didTapForgotPassword(email: emailTextField.text)
     }
 }
 
@@ -149,9 +128,6 @@ extension LoginView: UITextFieldDelegate {
             nextField.becomeFirstResponder()
         } else {
             textField.resignFirstResponder()
-            if textField == passwordTextField {
-                delegate?.didTapLogin(email: emailTextField.text, password: passwordTextField.text)
-            }
         }
         return true
     }
