@@ -191,7 +191,7 @@ final class HomeController: UIViewController {
                 }
             case .failure(let error):
                 DispatchQueue.main.async {
-                    print("Falha ao verificar carrinho: \(error.localizedDescription)")
+                    print("Falha ao verificar carro de compras: \(error.localizedDescription)")
                 }
             }
         }
@@ -203,12 +203,8 @@ final class HomeController: UIViewController {
             case .success:
                 print("Produto \(product.name ?? "") adicionado ao carrinho.")
                 self.showCartAnimation()
-                if let index = self.products.firstIndex(where: { $0.objectId == product.objectId }) {
-                    self.products[index].quantity = (self.products[index].quantity ?? 1) - 1
-                    self.homeView.tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
-                }
             case .failure(let error):
-                print("Falha ao atualizar carrinho: \(error.localizedDescription)")
+                print("Falha ao atualizar carro de compras: \(error.localizedDescription)")
             }
         }
     }
@@ -233,6 +229,13 @@ final class HomeController: UIViewController {
         let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: "OK", style: .default))
         present(alertController, animated: true)
+    }
+    
+    func updateProductQuantity(productId: String, newQuantity: Int) {
+        if let index = products.firstIndex(where: { $0.objectId == productId }) {
+            products[index].quantity = newQuantity
+            homeView.tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+        }
     }
 }
 

@@ -17,7 +17,7 @@ final class PaymentService: PaymentProtocol {
                         case .success:
                             break
                         case .failure(let error):
-                            print("Erro ao remover item do carrinho: \(error.localizedDescription)")
+                            print("Erro ao remover item do carro de compras: \(error.localizedDescription)")
                             success = false
                         }
                         dispatchGroup.leave()
@@ -29,14 +29,14 @@ final class PaymentService: PaymentProtocol {
                 }
                 
             case .failure(let error):
-                print("Erro ao buscar os itens do carrinho: \(error.localizedDescription)")
+                print("Erro ao buscar os itens do carro de compras: \(error.localizedDescription)")
                 completion(false)
             }
         }
     }
     
     func updateProductQuantity(productId: String, newQuantity: Int, completion: @escaping (Bool) -> Void) {
-        var query = Product.query("objectId" == productId)
+        let query = Product.query("objectId" == productId)
         
         query.first { result in
             switch result {

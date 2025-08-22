@@ -57,7 +57,7 @@ final class CartService: CartProtocol {
                         }
                     }
                 } else {
-                    let error = NSError(domain: "CartService", code: 404, userInfo: [NSLocalizedDescriptionKey: "Produto não encontrado no carrinho"])
+                    let error = NSError(domain: "CartService", code: 404, userInfo: [NSLocalizedDescriptionKey: "Produto não encontrado no carro de compras"])
                     DispatchQueue.main.async {
                         completion(.failure(error))
                     }
