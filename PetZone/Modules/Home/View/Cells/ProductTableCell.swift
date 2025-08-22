@@ -119,29 +119,41 @@ final class ProductTableCell: UITableViewCell {
         plusButton.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
     }
     
-    func configure(with product: Product) {
-        self.product = product
-        productNameLabel.text = product.name
-        productPriceLabel.text = formatPrice(product.price)
-        
-        if let imageUrl = product.image?.url {
-            productImageView.loadImage(from: imageUrl.absoluteString)
-        } else {
-            productImageView.image = UIImage(systemName: "photo")
-        }
-        
-        if let quantity = product.quantity, quantity <= 0 {
-            soldOutLabel.isHidden = false
-            plusButton.isHidden = true
-            productNameLabel.textColor = .lightGray
-            productPriceLabel.textColor = .lightGray
-        } else {
-            soldOutLabel.isHidden = true
-            plusButton.isHidden = false
-            productNameLabel.textColor = .black
-            productPriceLabel.textColor = .gray
-        }
-    }
+    override func prepareForReuse() {
+          super.prepareForReuse()
+          
+          productImageView.cancelImageLoad()
+          productImageView.image = nil
+          
+          soldOutLabel.isHidden = true
+          plusButton.isHidden = false
+          productNameLabel.textColor = .black
+          productPriceLabel.textColor = .gray
+      }
+      
+      func configure(with product: Product) {
+          self.product = product
+          productNameLabel.text = product.name
+          productPriceLabel.text = formatPrice(product.price)
+          
+          if let imageUrl = product.image?.url?.absoluteString {
+              productImageView.loadImage(from: imageUrl)
+          } else {
+              productImageView.image = nil
+          }
+          
+          if let quantity = product.quantity, quantity <= 0 {
+              soldOutLabel.isHidden = false
+              plusButton.isHidden = true
+              productNameLabel.textColor = .lightGray
+              productPriceLabel.textColor = .lightGray
+          } else {
+              soldOutLabel.isHidden = true
+              plusButton.isHidden = false
+              productNameLabel.textColor = .black
+              productPriceLabel.textColor = .gray
+          }
+      }
     
     private func formatPrice(_ price: Double?) -> String {
         guard let price = price else { return "Preço não disponível" }
