@@ -1,3 +1,5 @@
 # Arquivos específicos para ignorar
 .DS_Store
-**/UserInterfaceState.xcuserstate
+**/UserInterfaceState.xcuserstate.DS_Store
+._.DS_Store
+**/.DS_Store
