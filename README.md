@@ -1,24 +1,28 @@
+<img src="Media/Logo.png" alt="PetZone Logo" width="300"/>
+
 # PetZone App
 
 ![Swift](https://img.shields.io/badge/Swift-5.7-orange?logo=swift)
-![UIKit](https://img.shields.io/badge/UIKit-iOS-blue)
+![UIKit](https://img.shields.io/badge/UIKit-iOS15.0-blue)
 
 ---
 
 ## 📃 Descrição
 
-O **PetZone App** é um aplicativo iOS desenvolvido em **Swift** com **UIKit** para oferecer uma experiência de compras online voltada para produtos de pet shop. Ele utiliza o **ParseSwift** para integração com o backend Back4App, permitindo gerenciamento de produtos, carrinho de compras, autenticação de usuários e pagamentos. 
+O **PetZone App** é um aplicativo iOS desenvolvido em **Swift** com **UIKit** para compras online de produtos de pet shop. Utiliza o **ParseSwift** para integração com o backend **Back4App**, gerenciando produtos, carro de compras, autenticação e pagamentos.
 
-O projeto segue uma arquitetura modular com serviços bem definidos, separando responsabilidades entre interface de usuário, lógica de negócios e integração com o backend. A aplicação é responsiva, adaptando-se a diferentes tamanhos de tela de dispositivos iOS, e inclui animações visuais para melhorar a experiência do usuário.
+O projeto segue a arquitetura **MVC (Model-View-Controller)**, com **Model** para lógica de negócios, **View** para interface, e **Controllers** para interação entre views e modelos, usando protocolos para modularidade.
+
+A interface é intuitiva, com navegação fluida, animações e responsividade para diferentes telas.
 
 ---
 
 ## 💻 Tecnologias Utilizadas
 
 - **Swift** → Linguagem de programação para desenvolvimento iOS.
-- **UIKit** → Framework para construção de interfaces de usuário.
-- **ParseSwift** → SDK para integração com o backend Back4App.
-- **SpriteKit** → Framework para animações 2D, usado na animação do carrinho.
+- **UIKit** → Framework para construção de interfaces de usuário (suporte a iOS 15.0+). [Saiba mais sobre UIKit](https://developer.apple.com/documentation/uikit).
+- **ParseSwift** → SDK para integração com o backend Back4App. [Saiba mais sobre ParseSwift](https://github.com/parse-community/Parse-Swift).
+- **SpriteKit** → Framework para animações 2D, usado na animação do carro de compras.
 - **CoreData** → Persistência local de dados.
 - **URLSession** → Comunicação com APIs para carregamento de imagens.
 - **NSCache** → Cache de imagens para otimização de desempenho.
@@ -28,48 +32,46 @@ O projeto segue uma arquitetura modular com serviços bem definidos, separando r
 ## 🛎️ Funcionalidades
 
 ### 🔹 Autenticação
-- **Login**: Validação de email e senha com integração ao Back4App.
-- **Registro**: Cadastro de novos usuários com validação de nome, email e senha.
-- **Recuperação de Senha**: Envio de email para redefinição de senha.
-- **Logout**: Finalização segura da sessão do usuário.
+- Login com validação de email e senha via Back4App.
+- Registro de novos usuários com validação de nome, email e senha.
+- Recuperação de senha via e-mail.
+- Logout seguro.
 
 ### 🔹 Catálogo de Produtos
-- Lista de produtos com:
+- Visualização de produtos com:
   - Nome
   - Preço
   - Imagem
   - Indicador de estoque ("ESGOTADO" para produtos sem estoque).
-- Detalhes do produto exibidos em um alerta, incluindo:
+- Detalhes do produto em alertas, incluindo:
   - Código
   - Descrição
   - Quantidade
   - Categoria
   - Validade
 
-### 🔹 Carrinho de Compras
-- Adição de produtos ao carrinho com validação de estoque.
-- Exibição de itens no carrinho com nome, preço e quantidade.
-- Cálculo automático do total do carrinho.
-- Animação de adição ao carrinho usando **SpriteKit**.
+### 🔹 Carro de Compras
+- Adição de produtos com validação de estoque.
+- Exibição de itens com nome, preço e quantidade.
+- Cálculo automático do total do carro de compras.
+- Animação de adição ao carro de compras com **SpriteKit**.
 
 ### 🔹 Pagamento
-- Suporte a dois métodos de pagamento:
+- Métodos de pagamento:
   - **Pix**: Geração de código de pagamento copiado para a área de transferência.
-  - **Cartão de Crédito**: Formulário para inserção de dados do cartão (número, nome, validade e CVV).
-- Confirmação de pagamento com alertas e atualização de estoque no backend.
-- Limpeza do carrinho após conclusão do pagamento.
+  - **Cartão de Crédito**: Formulário para dados do cartão (número, nome, validade, CVV).
+- Confirmação de pagamento com alertas e atualização de estoque.
+- Limpeza do carro de compras após pagamento.
 
 ### 🔹 Menu Lateral
 - Exibe o nome do usuário logado.
-- Opções para:
-  - Acessar a tela "Sobre".
-  - Realizar logout.
+- Opções para acessar a tela "Sobre" e realizar logout.
 
 ### 🔹 Gerenciamento de Estados
 - **Loading**: Indicadores de carregamento para operações assíncronas.
-- **Success**: Exibição de dados carregados com sucesso.
-- **Error**: Tratamento de erros com mensagens amigáveis ao usuário.
-- **Toast Messages**: Notificações visuais para ações como envio de email de recuperação.
+- **Success**: Exibição de dados carregados.
+- **Error**: Tratamento de erros com mensagens amigáveis.
+- **Toast Messages**: Notificações visuais para ações como envio de email.
 
 ### 🔹 Navegação
 - Navegação fluida com `UINavigationController`.
@@ -80,7 +82,7 @@ O projeto segue uma arquitetura modular com serviços bem definidos, separando r
 
 ## 📱 Responsividade
 
-- Interface adaptada para diferentes tamanhos de tela usando **Auto Layout** e **Safe Area Layout Guides**.
+- Interface adaptada com **Auto Layout** e **Safe Area Layout Guides**.
 - Componentes visuais (botões, imagens, textos) ajustados dinamicamente com `NSLayoutConstraint`.
 - Suporte a modo claro e escuro do iOS.
 
@@ -91,57 +93,79 @@ O projeto segue uma arquitetura modular com serviços bem definidos, separando r
 ### Pré-requisitos
 - **Xcode** (versão 14.0 ou superior).
 - **Dispositivo iOS** ou simulador (iOS 15.0 ou superior).
-- Conta no **Back4App** com as chaves de API configuradas.
+- Conta no [Back4App](https://www.back4app.com/) configurada com chaves de API.
 
-### Passos
+### Clone o repositório
 
-```bash
-# 1. Clone o repositório
-git clone https://github.com/seu-user/petzone-app.git
-cd petzone-app
+- git clone https://github.com/seu-user/seu-projeto-app.git
 
-# 2. Instale as dependências
-pod install
+### Abra o projeto no Xcode
 
-# 3. Configure as chaves do Back4App
-# Edite o arquivo APIClient.swift com suas chaves de applicationId e clientKey.
+- Abra o Xcode.
+- Selecione File > Open e escolha o arquivo .xcodeproj ou .xcworkspace na pasta do projeto.
+- Aguarde o Xcode processar os arquivos e indexar o projeto.
 
-# 4. Abra o projeto no Xcode
-open PetZoneApp.xcworkspace
+### Configure o Back4App
 
-# 5. Compile e execute o app
-# Selecione um dispositivo/simulador e clique em "Run" no Xcode.
+- Acesse o Back4App Dashboard.
+- Crie um novo aplicativo ou selecione um existente.
+- Copie as chaves Application ID e Client Key do Back4App.
+- No Xcode, abra o arquivo de configuração (geralmente AppDelegate.swift ou Configuration.swift) e adicione as chaves:
+swiftimport Parse
 
-# Configuração do Back4App
+  ```bash
+  func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+      let configuration = ParseClientConfiguration {
+          $0.applicationId = "SUA_APPLICATION_ID"
+          $0.clientKey = "SUA_CLIENT_KEY"
+          $0.server = "https://parseapi.back4app.com"
+      }
+      Parse.initialize(with: configuration)
+      return true
+  }
+- Habilite os serviços necessários no Back4App Dashboard (ex.: Database, Cloud Code, ou outros, conforme o projeto).
 
-## Criar uma Conta no Back4App
-1. Acesse o site do [Back4App](https://www.back4app.com/) e crie uma conta.
-2. Faça login no painel do Back4App.
+### Instale as dependências
 
-## Configurar as Classes no Painel do Back4App
-1. No painel, crie as seguintes classes:
-   - **Product**: Para armazenar informações dos produtos.
-   - **Cart**: Para gerenciar os itens no carrinho de compras.
-   - **User**: Para gerenciar os dados dos usuários.
-2. Configure os campos necessários para cada classe, como nome, preço, ID do usuário, etc.
+#### Se o projeto usar CocoaPods:
+- Certifique-se de ter o CocoaPods instalado (sudo gem install cocoapods).
+- Na pasta do projeto, execute:
+- bashpod install
+- Abra o arquivo .xcworkspace gerado pelo CocoaPods no Xcode.
 
-## Adicionar Chaves no APIClient.swift
-1. No painel do Back4App, localize as chaves `applicationId` e `clientKey` na seção de configurações do aplicativo.
-2. Abra o arquivo `APIClient.swift` no projeto.
-3. Adicione as chaves ao código, como no exemplo abaixo:
+#### Se o projeto usar Swift Package Manager:
+- No Xcode, vá em File > Add Packages e adicione as URLs dos pacotes necessários (ex.: ParseSwift).
+- Aguarde o Xcode resolver e baixar as dependências.
 
-```swift
-struct APIClient {
-    static let applicationId = "INSIRA_SEU_APPLICATION_ID"
-    static let clientKey = "INSIRA_SEU_CLIENT_KEY"
-}
+### Simulador
 
-## Demonstração
-(Adicione aqui um GIF ou screenshot do app, se disponível)
+- No Xcode, selecione um simulador no menu superior (ex.: iPhone 14 Pro com iOS 16 ou superior).
+- Clique no botão Run (ícone de play) ou pressione Cmd + R para iniciar o simulador.
 
-📝 **Notas Adicionais**
+### Dispositivo físico
 
-- O projeto utiliza **CoreData** para persistência local, garantindo robustez no gerenciamento de dados offline.
-- A classe `ImageCache` otimiza o carregamento de imagens, reduzindo o uso de rede.
-- Animações com **SpriteKit** adicionam um toque visual ao processo de adição ao carrinho.
-- O código segue boas práticas de **Swift**, com injeção de dependências e separação de responsabilidades.
+#### Via cabo USB
+
+- Conecte o dispositivo iOS ao Mac via cabo USB.
+- Habilite o Modo Desenvolvedor no dispositivo (Configurações > Privacidade e Segurança > Modo Desenvolvedor).
+- No Xcode, selecione o dispositivo físico no menu superior.
+- Se necessário, assine o aplicativo com sua Apple Developer Account:
+
+  - Vá em Xcode > Settings > Accounts e adicione sua conta.
+  - Em Signing & Capabilities, selecione sua equipe de desenvolvimento.
+
+#### Via Wi-Fi
+
+- Certifique-se de que o dispositivo e o Mac estão na mesma rede Wi-Fi.
+- No Xcode, vá em Window > Devices and Simulators.
+- Selecione o dispositivo conectado via USB e marque a opção Connect via Network.
+- Desconecte o cabo USB; o dispositivo permanecerá disponível para deploy sem fio.
+
+### Rode o app
+
+- Selecione o simulador ou dispositivo físico no menu superior do Xcode.
+- Clique em Run (ícone de play) ou pressione Cmd + R.
+
+Alternativamente, no terminal, use:
+  ```bash
+  xcodebuild -workspace seu-projeto-app.xcworkspace -scheme SeuProjeto -destination 'platform=iOS Simulator,name=iPhone 14 Pro' build
