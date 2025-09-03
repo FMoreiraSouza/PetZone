@@ -1,5 +1,7 @@
 <img src="Media/Logo.png" alt="PetZone Logo" width="300"/>
 
+# PetZone
+
 ![Swift](https://img.shields.io/badge/Swift-5.7-orange?logo=swift)
 ![UIKit](https://img.shields.io/badge/UIKit-iOS15.0-blue)
 
@@ -7,7 +9,7 @@
 
 ## 📃 Descrição
 
-O **PetZone App** é um aplicativo iOS desenvolvido em **Swift** com **UIKit** para compras online de produtos de pet shop. Utiliza o **ParseSwift** para integração com o backend **Back4App**, gerenciando produtos, carro de compras, autenticação e pagamentos.
+O **PetZone** é um aplicativo iOS desenvolvido em **Swift** com **UIKit** para compras online de produtos de pet shop. Utiliza o **ParseSwift** para integração com o backend **Back4App**, gerenciando produtos, carro de compras, autenticação e pagamentos.
 
 O projeto segue a arquitetura **MVC (Model-View-Controller)**, com **Model** para lógica de negócios, **View** para interface, e **Controllers** para interação entre views e modelos, usando protocolos para modularidade.
 
