@@ -20,8 +20,8 @@ A interface é intuitiva, com navegação fluida, animações e responsividade p
 ## 💻 Tecnologias Utilizadas
 
 - **Swift** → Linguagem de programação para desenvolvimento iOS.
-- **UIKit** → Framework para construção de interfaces de usuário (suporte a iOS 15.0+). [Saiba mais sobre UIKit](https://developer.apple.com/documentation/uikit).
-- **ParseSwift** → SDK para integração com o backend Back4App. [Saiba mais sobre ParseSwift](https://github.com/parse-community/Parse-Swift).
+- **UIKit** → Framework para construção de interfaces de usuário (suporte a iOS 15.0+).
+- **ParseSwift** → SDK para integração com o backend Back4App.
 - **SpriteKit** → Framework para animações 2D, usado na animação do carro de compras.
 - **CoreData** → Persistência local de dados.
 - **URLSession** → Comunicação com APIs para carregamento de imagens.
