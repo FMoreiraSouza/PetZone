@@ -42,7 +42,7 @@ A interface é intuitiva, com navegação fluida, animações e responsividade p
   - Nome
   - Preço
   - Imagem
-  - Indicador de estoque ("ESGOTADO" para produtos sem estoque).
+  - Indicador de estoque ("Esgotado" para produtos sem estoque).
 - Detalhes do produto em alertas, incluindo:
   - Código
   - Descrição
@@ -164,8 +164,14 @@ swiftimport Parse
 ### Rode o app
 
 - Selecione o simulador ou dispositivo físico no menu superior do Xcode.
-- Clique em Run (ícone de play) ou pressione Cmd + R.
-
-Alternativamente, no terminal, use:
+- Clique em Run (ícone de play) ou pressione Cmd + R ou alternativamente, no terminal, use:
   ```bash
-  xcodebuild -workspace seu-projeto-app.xcworkspace -scheme SeuProjeto -destination 'platform=iOS Simulator,name=iPhone 14 Pro' build
+    xcodebuild -workspace seu-projeto-app.xcworkspace -scheme SeuProjeto -destination 'platform=iOS Simulator,name=iPhone 14 Pro' build
+
+---
+
+## 🎥 Apresentação do Aplicativo
+
+Confira a apresentação do aplicativo:  
+
+- [Apresentação](https://youtu.be/xgrYM1RJArE)
