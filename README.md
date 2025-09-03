@@ -97,7 +97,7 @@ A interface é intuitiva, com navegação fluida, animações e responsividade p
 
 ### Clone o repositório
 
-- git clone https://github.com/seu-user/seu-projeto-app.git
+- git clone URL do projeto
 
 ### Abra o projeto no Xcode
 
