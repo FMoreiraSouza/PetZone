@@ -1,7 +1,5 @@
 <img src="Media/Logo.png" alt="PetZone Logo" width="300"/>
 
-# PetZone App
-
 ![Swift](https://img.shields.io/badge/Swift-5.7-orange?logo=swift)
 ![UIKit](https://img.shields.io/badge/UIKit-iOS15.0-blue)
 
