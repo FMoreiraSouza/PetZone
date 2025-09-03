@@ -1,4 +1,4 @@
-<img src="Media/Logo.png" alt="PetZone Logo" width="300"/>
+<img src="Media/Logo.png" alt="PetZone Logo" width="400"/>
 
 # PetZone
 
