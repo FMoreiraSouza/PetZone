@@ -94,7 +94,7 @@ O **PetZone** é um aplicativo iOS desenvolvido em **Swift** com **UIKit** para 
 
 ### Clone o repositório
 
-- git clone URL do projeto
+- git clone <URL_DO_PROJETO>
 
 ### Abra o projeto no Xcode
 
