@@ -9,11 +9,7 @@
 
 ## 📃 Descrição
 
-O **PetZone** é um aplicativo iOS desenvolvido em **Swift** com **UIKit** para compras online de produtos de pet shop. Utiliza o **ParseSwift** para integração com o backend **Back4App**, gerenciando produtos, carro de compras, autenticação e pagamentos.
-
-O projeto segue a arquitetura **MVC (Model-View-Controller)**, com **Model** para lógica de negócios, **View** para interface, e **Controllers** para interação entre views e modelos, usando protocolos para modularidade.
-
-A interface é intuitiva, com navegação fluida, animações e responsividade para diferentes telas.
+O **PetZone** é um aplicativo iOS desenvolvido em **Swift** com **UIKit** para compras online de produtos de pet shop. Utiliza o **ParseSwift** para integração com o backend **Back4App**, gerenciando produtos, carro de compras, autenticação e pagamentos. O projeto segue a arquitetura **MVC (Model-View-Controller)**, com **Model** para lógica de negócios, **View** para interface, e **Controllers** para interação entre views e modelos, usando protocolos para modularidade. A interface é intuitiva, com navegação fluida, animações e responsividade para diferentes telas.
 
 ---
 
@@ -91,6 +87,7 @@ A interface é intuitiva, com navegação fluida, animações e responsividade p
 ## ▶️ Como Rodar o Projeto
 
 ### Pré-requisitos
+
 - **Xcode** (versão 14.0 ou superior).
 - **Dispositivo iOS** ou simulador (iOS 15.0 ou superior).
 - Conta no [Back4App](https://www.back4app.com/) configurada com chaves de API.
@@ -128,12 +125,14 @@ swiftimport Parse
 ### Instale as dependências
 
 #### Se o projeto usar CocoaPods:
+
 - Certifique-se de ter o CocoaPods instalado (sudo gem install cocoapods).
 - Na pasta do projeto, execute:
 - bashpod install
 - Abra o arquivo .xcworkspace gerado pelo CocoaPods no Xcode.
 
 #### Se o projeto usar Swift Package Manager:
+
 - No Xcode, vá em File > Add Packages e adicione as URLs dos pacotes necessários (ex.: ParseSwift).
 - Aguarde o Xcode resolver e baixar as dependências.
 
@@ -150,7 +149,6 @@ swiftimport Parse
 - Habilite o Modo Desenvolvedor no dispositivo (Configurações > Privacidade e Segurança > Modo Desenvolvedor).
 - No Xcode, selecione o dispositivo físico no menu superior.
 - Se necessário, assine o aplicativo com sua Apple Developer Account:
-
   - Vá em Xcode > Settings > Accounts e adicione sua conta.
   - Em Signing & Capabilities, selecione sua equipe de desenvolvimento.
 
