@@ -172,6 +172,4 @@ swiftimport Parse
 
 ## 🎥 Apresentação do Aplicativo
 
-Confira a apresentação do aplicativo:  
-
-- [Apresentação](https://youtu.be/xgrYM1RJArE)
+Confira a apresentação do aplicativo: [Apresentação](https://youtu.be/xgrYM1RJArE)
