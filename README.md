@@ -1,4 +1,6 @@
-<img src="Media/Logo.png" alt="Logo" width="400"/>
+<p align="center">
+  <img src="Media/Logo.png" alt="Logo" width="400"/>
+</p>
 
 # Pet Zone
 
