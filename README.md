@@ -9,7 +9,7 @@
 
 ## 📃 Descrição
 
-O **Pet Zone** é um aplicativo iOS desenvolvido em **Swift** com **UIKit** para compras online de produtos de pet shop. Utiliza o **ParseSwift** para integração com o backend **Back4App**, gerenciando produtos, carro de compras, autenticação e pagamentos. O projeto segue a arquitetura **MVC (Model-View-Controller)**, com **Model** para lógica de negócios, **View** para interface, e **Controllers** para interação entre views e modelos, usando protocolos para modularidade. A interface é intuitiva, com navegação fluida, animações e responsividade para diferentes
+O **Pet Zone** é um aplicativo iOS desenvolvido em **Swift** com **UIKit** para compras online de produtos de pet shop. Utiliza o **ParseSwift** para integração com o backend **Back4App**, gerenciando produtos, carro de compras, autenticação e pagamentos. O projeto segue a arquitetura **MVC (Model-View-Controller)**, com **Model** para lógica de negócios, **View** para interface, e **Controllers** para interação entre views e modelos, usando protocolos para modularidade. A interface é intuitiva, com navegação fluida, animações e responsividade para diferentes telas.
 
 ---
 
