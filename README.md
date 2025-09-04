@@ -63,12 +63,6 @@ O **PetZone** é um aplicativo iOS desenvolvido em **Swift** com **UIKit** para 
 - Exibe o nome do usuário logado.
 - Opções para acessar a tela "Sobre" e realizar logout.
 
-### 🔹 Gerenciamento de Estados
-- **Loading**: Indicadores de carregamento para operações assíncronas.
-- **Success**: Exibição de dados carregados.
-- **Error**: Tratamento de erros com mensagens amigáveis.
-- **Toast Messages**: Notificações visuais para ações como envio de email.
-
 ### 🔹 Navegação
 - Navegação fluida com `UINavigationController`.
 - Transições animadas entre telas (Welcome, Login, Register, Home, Cart, Payment, About).
